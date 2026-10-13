@@ -1,0 +1,21 @@
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosversion
+*.filters
+*.aps
+
+# CMake / Build / Out
+build/
+out/
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+*.cmake
+install_manifest.txt
+compile_commands.json
+
+# Python
+__pycache__/
+*.pyc

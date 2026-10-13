@@ -1,0 +1,51 @@
+#pragma once
+#include <vector>
+#include <cmath>
+#include <algorithm>
+#include <iostream>
+
+struct OptimizationResult {
+    float fitness;
+    float max_error;
+    float mean_error;
+};
+
+class IHCPModel {
+public:
+    static constexpr int quantity = 501;
+    static constexpr int num_thermocouples = 2;
+    static constexpr int num_measurements = 100;
+    static constexpr int measurement_step = 10;
+
+    float lambda1 = 104.0f;
+    float lambda2 = 240.0f;
+    float c1 = 1290.0f;
+    float c2 = 1000.0f;
+    float rho1 = 2380.0f;
+    float rho2 = 2679.0f;
+    float solid_temp = 930.0f;
+    float ambient_temp = 298.0f;
+    float pouring_temp = 1013.0f;
+    float L = 390000.0f;
+
+    float start_pos = 0.0f;
+    float end_pos = 0.1f;
+    float tau = 0.1f;
+    float tx1 = 110.0f;
+
+    int node_indices[num_thermocouples] = { 451, 401 };
+    float start_times[num_thermocouples] = { 105.0f, 117.0f };
+
+    std::vector<float> exact_temperatures;
+
+    IHCPModel();
+    OptimizationResult objective_function(const std::vector<float>& parameters_q) const;
+
+private:
+    void thomas_algorithm(int dim, const std::vector<float>& a, const std::vector<float>& b,
+        const std::vector<float>& c, const std::vector<float>& d, std::vector<float>& wx) const;
+    float temperature_from_enthalpy(float enthalpy, float H1, float H2, float time) const;
+    float d_i(int stage, float ent, float H1, float param1, float param2, float time) const;
+    void run_simulation(const std::vector<float>& parameters_q, std::vector<std::vector<float>>& out_reconstructed) const;
+    void generate_reference_data(const std::vector<float>& true_params);
+};
