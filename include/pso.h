@@ -16,8 +16,11 @@ class ParticleSwarmOptimizer {
 private:
     int population_size;
     int num_iterations;
-    float w, c1, c2;
-    float lower_bound, upper_bound;
+    float inertia;
+    float c1;
+    float c2;
+    std::vector<float> lower_bounds;
+    std::vector<float> upper_bounds;
 
     struct Particle {
         std::vector<float> position;
@@ -28,6 +31,8 @@ private:
     };
 
 public:
-    ParticleSwarmOptimizer(int pop_size, int iter, float inertia, float c1, float c2, float lb, float ub);
+    ParticleSwarmOptimizer::ParticleSwarmOptimizer(
+        int pop_size, int iter, float inertia, float c1, float c2,
+        const std::vector<float>& lb, const std::vector<float>& ub);
     PSOResult optimize(const IHCPModel& model, int dimensions);
 };

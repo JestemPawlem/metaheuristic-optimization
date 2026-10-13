@@ -18,7 +18,7 @@ void IHCPModel::thomas_algorithm(int dim, const std::vector<float>& a, const std
 
     for (int j = 2; j <= dim - 1; ++j) {
         float denom = a[j] * beta[j - 1] + b[j];
-        if (std::abs(denom) < 1e-12f) denom = 1e-12f;
+        if (std::abs(denom) < 1e-12f) [[unlikely]] denom = 1e-12f;
         beta[j] = -c[j] / denom;
         gamma[j] = (d[j] - a[j] * gamma[j - 1]) / denom;
     }
