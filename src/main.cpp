@@ -1,8 +1,10 @@
+#include <cstddef>
 #include <cstdlib>
-#include <iostream>
+#include <print>
 #include <string>
 #include <vector>
 
+#include "color.h"
 #include "ihcp_model.h"
 #include "pso.h"
 
@@ -16,8 +18,8 @@ int main(int argc, char* argv[])
 	float inertia = 0.7f;
 	float c1 = 1.5f;
 	float c2 = 1.5f;
-	std::vector<float> lower_bounds = { 0.0f, 0.0f };
-	std::vector<float> upper_bounds = { 800'000.0f, 10'000.0f };
+	std::vector<float> lower_bounds = { 100'000.0f, 1'000.0f };
+	std::vector<float> upper_bounds = { 600'000.0f, 8'000.0f };
 
 	for (int i = 1; i < argc - 1; i += 2)
 	{
@@ -40,14 +42,14 @@ int main(int argc, char* argv[])
 		upper_bounds
 	);
 
-	std::cout << "Running PSO optimization for IHCP...\n";
+	std::println("{}Running PSO optimization for IHCP...{}", color::cyan, color::reset);
 	PSOResult result = pso.optimize(model, 2);
 
-	std::cout << "\n=== FINAL PSO OPTIMIZATION RESULTS ===\n";
-	std::cout << "Optimal heat flux (q):                 " << result.best_position[0] << std::endl;
-	std::cout << "Optimal heat transfer coeff. (alpha):  " << result.best_position[1] << std::endl;
-	std::cout << "Objective function value (Fitness):    " << result.best_fitness << std::endl;
-	std::cout << "Achieved mean error:                   " << result.best_mean_error << std::endl;
+	std::println("{}PSO optimization finished.{}", color::cyan, color::reset);
+	std::println("Optimal heat flux (q):                 {}{:.2f}{}", color::yellow, result.best_position[0], color::reset);
+	std::println("Optimal heat transfer coeff. (alpha):  {}{:.2f}{}", color::yellow, result.best_position[1], color::reset);
+	std::println("Objective function value (Fitness):    {:.4f}", result.best_fitness);
+	std::println("Achieved mean error:                   {:.6f} K", result.best_mean_error);
 
 	return 0;
 }
