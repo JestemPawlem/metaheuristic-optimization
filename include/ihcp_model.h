@@ -1,16 +1,15 @@
 #pragma once
+
+#include <array>
+#include <cstddef>
 #include <vector>
-#include <cmath>
-#include <algorithm>
-#include <iostream>
 
-struct OptimizationResult {
-    float fitness;
-    float max_error;
-    float mean_error;
-};
+#include "ihcp_parameters.h"
+#include "ihcp_result.h"
 
-class IHCPModel {
+
+class ihcp_model
+{
 public:
     static constexpr int quantity = 501;
     static constexpr int num_thermocouples = 2;
@@ -38,14 +37,26 @@ public:
 
     std::vector<float> exact_temperatures;
 
-    IHCPModel();
-    OptimizationResult objective_function(const std::vector<float>& parameters_q) const;
+    ihcp_model();
+
+    ihcp_result objective_function(const ihcp_parameters& parameters_q) const;
 
 private:
-    void thomas_algorithm(int dim, const std::vector<float>& a, const std::vector<float>& b,
-        const std::vector<float>& c, const std::vector<float>& d, std::vector<float>& wx) const;
+    void thomas_algorithm(
+        int dim,
+        const std::vector<float>& a,
+        const std::vector<float>& b,
+        const std::vector<float>& c,
+        const std::vector<float>& d,
+        std::vector<float>& wx) const;
+
     float temperature_from_enthalpy(float enthalpy, float H1, float H2, float time) const;
+
     float d_i(int stage, float ent, float H1, float param1, float param2, float time) const;
-    void run_simulation(const std::vector<float>& parameters_q, std::vector<std::vector<float>>& out_reconstructed) const;
-    void generate_reference_data(const std::vector<float>& true_params);
+
+    void run_simulation(
+        const ihcp_parameters& parameters_q,
+        std::vector<std::vector<float>>& out_reconstructed) const;
+
+    void generate_reference_data(const ihcp_parameters& true_params);
 };

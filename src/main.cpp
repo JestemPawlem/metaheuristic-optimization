@@ -1,55 +1,68 @@
+#include <array>
 #include <cstddef>
 #include <cstdlib>
-#include <print>
+#include <memory>
 #include <string>
-#include <vector>
 
 #include "color.h"
 #include "ihcp_model.h"
+#include "run_experiment.h"
 #include "pso.h"
+#include "print.h"
 
 
 int main(int argc, char* argv[])
 {
-	std::system("chcp 65001 > nul");
+    std::system("chcp 65001 > nul");
 
-	int pop_size = 30;
-	int iterations = 30;
-	float inertia = 0.7f;
-	float c1 = 1.5f;
-	float c2 = 1.5f;
-	std::vector<float> lower_bounds = { 100'000.0f, 1'000.0f };
-	std::vector<float> upper_bounds = { 600'000.0f, 8'000.0f };
+    std::size_t n_runs = 5;
+    std::size_t population_size = 20;
+    std::size_t n_iterations = 20;
+    float inertia = 0.7f;
+    float c1 = 1.5f;
+    float c2 = 1.5f;
 
-	for (int i = 1; i < argc - 1; i += 2)
-	{
-		std::string arg = argv[i];
-		if (arg == "--n-pop") pop_size = std::stoi(argv[i + 1]);
-		else if (arg == "--n-iter") iterations = std::stoi(argv[i + 1]);
-		else if (arg == "--inertia") inertia = std::stof(argv[i + 1]);
-		else if (arg == "--c1") c1 = std::stof(argv[i + 1]);
-		else if (arg == "--c2") c2 = std::stof(argv[i + 1]);
-	}
+    ihcp_bounds bounds = {
+        { 100'000.0f, 1'000.0f },
+        { 600'000.0f, 8'000.0f }
+    };
 
-	IHCPModel model;
-	ParticleSwarmOptimizer pso(
-		pop_size,
-		iterations,
-		inertia,
-		c1,
-		c2,
-		lower_bounds,
-		upper_bounds
-	);
+    if (argc > 1) n_runs = std::stoul(argv[1]);
+    if (argc > 2) population_size = std::stoul(argv[2]);
+    if (argc > 3) n_iterations = std::stoul(argv[3]);
+    if (argc > 4) inertia = std::stof(argv[4]);
+    if (argc > 5) c1 = std::stof(argv[5]);
+    if (argc > 6) c2 = std::stof(argv[6]);
 
-	std::println("{}Running PSO optimization for IHCP...{}", color::cyan, color::reset);
-	PSOResult result = pso.optimize(model, 2);
+    ihcp_model model{};
+    auto pso_factory = [&]() -> std::unique_ptr<optimizer>
+        {
+            return std::make_unique<pso>(
+                model,
+                population_size,
+                n_iterations,
+                inertia,
+                c1,
+                c2,
+                bounds
+            );
+        };
 
-	std::println("{}PSO optimization finished.{}", color::cyan, color::reset);
-	std::println("Optimal heat flux (q):                 {}{:.2f}{}", color::yellow, result.best_position[0], color::reset);
-	std::println("Optimal heat transfer coeff. (alpha):  {}{:.2f}{}", color::yellow, result.best_position[1], color::reset);
-	std::println("Objective function value (Fitness):    {:.4f}", result.best_fitness);
-	std::println("Achieved mean error:                   {:.6f} K", result.best_mean_error);
+    experiment_result summary = run_experiment(n_runs, pso_factory);
 
-	return 0;
+    println("\n{0}===== OPTIMIZATION SUMMARY ====={1}", color::cyan, color::reset);
+    println("Total runs performed:     {}", summary.total_runs);
+    println("Runs used for average:    {}", summary.used_runs);
+
+    println("\n--- BEST OVERALL RESULT ---");
+    println("Optimal heat flux (q):                 {}{:.2f}{}", color::green, summary.best_result.best_parameters.q, color::reset);
+    println("Optimal heat transfer coeff. (alpha):  {}{:.2f}{}", color::green, summary.best_result.best_parameters.alpha, color::reset);
+    println("Best Fitness value:                    {:.4f}", summary.best_result.best_result.fitness);
+    println("Best Mean Error:                       {:.6f} K", summary.best_result.best_result.mean_error);
+
+    println("\n--- TRIMMED MEAN VALUES ---");
+    println("Average Fitness value:                 {:.4f}", summary.avg_fitness);
+    println("Average Mean Error:                    {:.6f} K", summary.avg_mean_error);
+
+    return 0;
 }

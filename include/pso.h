@@ -1,46 +1,47 @@
 #pragma once
+
+#include <array>
 #include <cstddef>
-#include <vector>
 #include <limits>
 
+#include "ihcp_bounds.h"
 #include "ihcp_model.h"
+#include "ihcp_parameters.h"
+#include "optimizer.h"
 
 
-struct PSOResult
-{
-    std::vector<float> best_position{};
-    float best_fitness = std::numeric_limits<float>::max();
-    float best_mean_error = std::numeric_limits<float>::max();
-};
-
-class ParticleSwarmOptimizer
+class pso : public optimizer
 {
 public:
-    ParticleSwarmOptimizer(
-        std::size_t pop_size,
-        std::size_t iter,
+    pso(
+        const ihcp_model& model,
+        std::size_t population_size,
+        std::size_t n_iterations,
         float inertia,
         float c1,
         float c2,
-        const std::vector<float>& lower_bounds,
-        const std::vector<float>& upper_bounds);
-    PSOResult optimize(const IHCPModel& model, std::size_t dimensions);
+        ihcp_bounds bounds
+    );
+
+    optimization_result optimize() override;
 
 private:
+    const ihcp_model& model;
+
     std::size_t population_size;
     std::size_t n_iterations;
+
     float inertia;
     float c1;
     float c2;
-    std::vector<float> lower_bounds;
-    std::vector<float> upper_bounds;
 
-    struct Particle
+    ihcp_bounds bounds;
+
+    struct particle
     {
-        std::vector<float> position;
-        std::vector<float> velocity;
-        std::vector<float> best_position;
-        float best_fitness = std::numeric_limits<float>::max();
-        float best_mean_error = std::numeric_limits<float>::max();
+        ihcp_parameters position{};
+        ihcp_parameters velocity{};
+        ihcp_parameters best_position{};
+        ihcp_result best_result{};
     };
 };
