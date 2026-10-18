@@ -1,12 +1,11 @@
 #include <algorithm>
 #include <limits>
+#include <print>
 #include <random>
 #include <vector>
 
-#include "color.h"
 #include "ihcp_model.h"
 #include "pso.h"
-#include "print.h"
 
 
 pso::pso(
@@ -29,6 +28,13 @@ pso::pso(
 
 optimization_result pso::optimize()
 {
+    std::size_t n_evaluations{};
+    auto evaluate = [&](const ihcp_parameters& params)
+        {
+            ++n_evaluations;
+            return model.objective_function(params);
+        };
+
     std::random_device rd;
     std::mt19937 gen(rd());
 
@@ -58,7 +64,7 @@ optimization_result pso::optimize()
             population[i].best_position[d] = population[i].position[d];
         }
 
-        ihcp_result result = model.objective_function(population[i].position);
+        ihcp_result result = evaluate(population[i].position);
 
         if (result < best_result)
         {
@@ -95,7 +101,7 @@ optimization_result pso::optimize()
                 }
             }
 
-            ihcp_result result = model.objective_function(population[p].position);
+            ihcp_result result = evaluate(population[p].position);
 
             if (result < population[p].best_result)
             {
@@ -110,8 +116,8 @@ optimization_result pso::optimize()
             }
         }
 
-        println("{}Iteration: {:3}/{}{}  |  Best Fitness: {:10.4f}  |  Mean Error: {:10.6f} K",
-            color::cyan, iter + 1, n_iterations, color::reset,
+        std::println("Iteration: {:3}/{}  |  Best Fitness: {:10.4f}  |  Mean Error: {:10.6f} K",
+            iter + 1, n_iterations,
             best_result.fitness,
             best_result.mean_error);
     }
@@ -119,5 +125,6 @@ optimization_result pso::optimize()
     optimization_result final_res;
     final_res.best_parameters = best_position;
     final_res.best_result = best_result;
+    final_res.n_evaluations = n_evaluations;
     return final_res;
 }

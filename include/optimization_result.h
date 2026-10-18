@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <limits>
 
 #include "ihcp_parameters.h"
@@ -10,6 +11,7 @@ struct optimization_result
 {
     ihcp_parameters best_parameters{};
     ihcp_result best_result{};
+    std::size_t n_evaluations{};
 
     auto operator<=>(const optimization_result& other) const noexcept
     {

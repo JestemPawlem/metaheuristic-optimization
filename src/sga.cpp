@@ -1,11 +1,10 @@
 #include <algorithm>
 #include <limits>
+#include <print>
 #include <random>
 #include <vector>
 
-#include "color.h"
 #include "ihcp_model.h"
-#include "print.h"
 #include "sga.h"
 
 
@@ -26,6 +25,13 @@ sga::sga(
 
 optimization_result sga::optimize()
 {
+    std::size_t n_evaluations{};
+    auto evaluate = [&](const ihcp_parameters& params)
+        {
+            ++n_evaluations;
+            return model.objective_function(params);
+        };
+
     std::random_device rd;
     std::mt19937 gen(rd());
 
@@ -49,7 +55,7 @@ optimization_result sga::optimize()
         for (std::size_t d{}; d < 2; ++d)
             population[i].genotype[d] = dist_genes[d](gen);
 
-        population[i].phenotype = model.objective_function(population[i].genotype);
+        population[i].phenotype = evaluate(population[i].genotype);
 
         if (population[i].phenotype < best_individual.phenotype)
             best_individual = population[i];
@@ -92,7 +98,7 @@ optimization_result sga::optimize()
                     offspring.genotype[d] = std::clamp(offspring.genotype[d], bounds.lower[d], bounds.upper[d]);
                 }
 
-            offspring.phenotype = model.objective_function(offspring.genotype);
+            offspring.phenotype = evaluate(offspring.genotype);
 
             next_population[i] = offspring;
 
@@ -102,8 +108,8 @@ optimization_result sga::optimize()
 
         population = next_population;
 
-        println("{}Iteration: {:3}/{}{}  |  Best Fitness: {:10.4f}  |  Mean Error: {:10.6f} K",
-            color::cyan, iter + 1, n_iterations, color::reset,
+        std::println("Iteration: {:3}/{}  |  Best Fitness: {:10.4f}  |  Mean Error: {:10.6f} K",
+            iter + 1, n_iterations,
             best_individual.phenotype.fitness,
             best_individual.phenotype.mean_error);
     }

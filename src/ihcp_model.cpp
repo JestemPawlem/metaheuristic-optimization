@@ -3,7 +3,6 @@
 
 #include "ihcp_model.h"
 #include "ihcp_parameters.h"
-#include "scope_tracer.h"
 
 
 ihcp_model::ihcp_model()
