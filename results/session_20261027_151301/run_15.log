@@ -1,0 +1,18 @@
+Running pso optimization...
+Starting 20 optimization runs for IHCP...
+
+--- Run 1 / 20 ---
+Iteration:   1/55  |  Best Fitness:  2586.0518  |  Mean Error:   2.505681 K
+Iteration:   2/55  |  Best Fitness:  2586.0518  |  Mean Error:   2.505681 K
+Iteration:   3/55  |  Best Fitness:  2586.0518  |  Mean Error:   2.505681 K
+Iteration:   4/55  |  Best Fitness:   677.0767  |  Mean Error:   1.739019 K
+Iteration:   5/55  |  Best Fitness:   677.0767  |  Mean Error:   1.739019 K
+Iteration:   6/55  |  Best Fitness:   128.9318  |  Mean Error:   0.782283 K
+Iteration:   7/55  |  Best Fitness:   128.9318  |  Mean Error:   0.782283 K
+Iteration:   8/55  |  Best Fitness:    35.5207  |  Mean Error:   0.408344 K
+Iteration:   9/55  |  Best Fitness:    35.5207  |  Mean Error:   0.408344 K
+Iteration:  10/55  |  Best Fitness:    35.5207  |  Mean Error:   0.408344 K
+Iteration:  11/55  |  Best Fitness:    13.1816  |  Mean Error:   0.216674 K
+Iteration:  12/55  |  Best Fitness:    13.1816  |  Mean Error:   0.216674 K
+Iteration:  13/55  |  Best Fitness:     5.6743  |  Mean Error:   0.156904 K
+Iteration:  14/55  |  Best Fitness:     0.2274  |  Mean Error:   0.030402 K

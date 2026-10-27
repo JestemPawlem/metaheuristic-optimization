@@ -1,3 +1,11 @@
+from pathlib import Path
+
+
+ROOT_DIR = Path(__file__).resolve().parent.parent
+RESULTS_DIR = ROOT_DIR / 'results'
+EXE_PATH = ROOT_DIR / 'out' / 'build' / 'x64-Release' / 'ihcp_optimizer.exe'
+
+
 COLOR_INFO = '\033[1;95m'
 COLOR_ERROR = '\033[1;91m'
 COLOR_RESET = '\033[0m'

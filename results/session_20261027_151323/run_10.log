@@ -1,0 +1,48 @@
+Running sga optimization...
+Starting 1 optimization runs for IHCP...
+
+--- Run 1 / 1 ---
+Iteration:   1/40  |  Best Fitness:   954.9136  |  Mean Error:   2.003802 K
+Iteration:   2/40  |  Best Fitness:   206.1307  |  Mean Error:   0.711005 K
+Iteration:   3/40  |  Best Fitness:   178.4240  |  Mean Error:   0.637844 K
+Iteration:   4/40  |  Best Fitness:    35.7765  |  Mean Error:   0.295093 K
+Iteration:   5/40  |  Best Fitness:    35.7765  |  Mean Error:   0.295093 K
+Iteration:   6/40  |  Best Fitness:    35.7765  |  Mean Error:   0.295093 K
+Iteration:   7/40  |  Best Fitness:     8.8817  |  Mean Error:   0.186887 K
+Iteration:   8/40  |  Best Fitness:     8.8817  |  Mean Error:   0.186887 K
+Iteration:   9/40  |  Best Fitness:     7.2586  |  Mean Error:   0.167908 K
+Iteration:  10/40  |  Best Fitness:     5.9562  |  Mean Error:   0.169610 K
+Iteration:  11/40  |  Best Fitness:     0.4456  |  Mean Error:   0.039211 K
+Iteration:  12/40  |  Best Fitness:     0.4456  |  Mean Error:   0.039211 K
+Iteration:  13/40  |  Best Fitness:     0.0213  |  Mean Error:   0.008952 K
+Iteration:  14/40  |  Best Fitness:     0.0213  |  Mean Error:   0.008952 K
+Iteration:  15/40  |  Best Fitness:     0.0104  |  Mean Error:   0.006917 K
+Iteration:  16/40  |  Best Fitness:     0.0104  |  Mean Error:   0.006917 K
+Iteration:  17/40  |  Best Fitness:     0.0094  |  Mean Error:   0.006584 K
+Iteration:  18/40  |  Best Fitness:     0.0042  |  Mean Error:   0.004424 K
+Iteration:  19/40  |  Best Fitness:     0.0042  |  Mean Error:   0.004424 K
+Iteration:  20/40  |  Best Fitness:     0.0009  |  Mean Error:   0.001971 K
+Iteration:  21/40  |  Best Fitness:     0.0009  |  Mean Error:   0.001971 K
+Iteration:  22/40  |  Best Fitness:     0.0000  |  Mean Error:   0.000296 K
+Iteration:  23/40  |  Best Fitness:     0.0000  |  Mean Error:   0.000049 K
+Iteration:  24/40  |  Best Fitness:     0.0000  |  Mean Error:   0.000004 K
+Iteration:  25/40  |  Best Fitness:     0.0000  |  Mean Error:   0.000002 K
+Iteration:  26/40  |  Best Fitness:     0.0000  |  Mean Error:   0.000002 K
+Iteration:  27/40  |  Best Fitness:     0.0000  |  Mean Error:   0.000000 K
+Iteration:  28/40  |  Best Fitness:     0.0000  |  Mean Error:   0.000000 K
+Iteration:  29/40  |  Best Fitness:     0.0000  |  Mean Error:   0.000000 K
+Iteration:  30/40  |  Best Fitness:     0.0000  |  Mean Error:   0.000000 K
+Iteration:  31/40  |  Best Fitness:     0.0000  |  Mean Error:   0.000000 K
+Iteration:  32/40  |  Best Fitness:     0.0000  |  Mean Error:   0.000000 K
+Iteration:  33/40  |  Best Fitness:     0.0000  |  Mean Error:   0.000000 K
+Iteration:  34/40  |  Best Fitness:     0.0000  |  Mean Error:   0.000000 K
+Iteration:  35/40  |  Best Fitness:     0.0000  |  Mean Error:   0.000000 K
+Iteration:  36/40  |  Best Fitness:     0.0000  |  Mean Error:   0.000000 K
+Iteration:  37/40  |  Best Fitness:     0.0000  |  Mean Error:   0.000000 K
+Iteration:  38/40  |  Best Fitness:     0.0000  |  Mean Error:   0.000000 K
+Iteration:  39/40  |  Best Fitness:     0.0000  |  Mean Error:   0.000000 K
+Iteration:  40/40  |  Best Fitness:     0.0000  |  Mean Error:   0.000000 K
+
+===== EXPERIMENT COMPLETE [sga] =====
+Completed runs:            1
+Output file:               C:\Users\pnosz\Projects\IHCPOptimization\results\session_20261027_151323\run_10.csv

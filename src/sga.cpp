@@ -7,7 +7,6 @@
 #include "ihcp_model.h"
 #include "sga.h"
 
-
 sga::sga(
     const ihcp_model& model,
     std::size_t population_size,
@@ -57,7 +56,7 @@ optimization_result sga::optimize()
 
         population[i].phenotype = evaluate(population[i].genotype);
 
-        if (population[i].phenotype < best_individual.phenotype)
+        if (i == 0 || population[i].phenotype < best_individual.phenotype)
             best_individual = population[i];
     }
 
@@ -65,9 +64,9 @@ optimization_result sga::optimize()
 
     for (std::size_t iter{}; iter < n_iterations; ++iter)
     {
-        next_population[0] = best_individual;
+        individual prev_best = best_individual;
 
-        for (std::size_t i{ 1 }; i < population_size; ++i)
+        for (std::size_t i{ 0 }; i < population_size; i += 2)
         {
             std::size_t p1 = dist_idx(gen);
             std::size_t p2 = dist_idx(gen);
@@ -79,32 +78,58 @@ optimization_result sga::optimize()
             const individual& parent2 = (population[p3].phenotype < population[p4].phenotype) ?
                 population[p3] : population[p4];
 
-            individual offspring;
+            individual offspring1, offspring2;
 
             if (dist_01(gen) < crossover_rate)
             {
                 float gamma = dist_01(gen);
                 for (std::size_t d{}; d < 2; ++d)
-                    offspring.genotype[d] = gamma * parent1.genotype[d] + (1.0f - gamma) * parent2.genotype[d];
+                {
+                    offspring1.genotype[d] = gamma * parent1.genotype[d] + (1.0f - gamma) * parent2.genotype[d];
+                    offspring2.genotype[d] = (1.0f - gamma) * parent1.genotype[d] + gamma * parent2.genotype[d];
+                }
             }
             else
-                offspring.genotype = parent1.genotype;
+            {
+                offspring1.genotype = parent1.genotype;
+                offspring2.genotype = parent2.genotype;
+            }
 
             for (std::size_t d{}; d < 2; ++d)
+            {
                 if (dist_01(gen) < mutation_rate)
                 {
                     std::normal_distribution<float> mut_dist(0.0f, gene_range[d] * 0.05f);
-                    offspring.genotype[d] += mut_dist(gen);
-                    offspring.genotype[d] = std::clamp(offspring.genotype[d], bounds.lower[d], bounds.upper[d]);
+                    offspring1.genotype[d] += mut_dist(gen);
+                    offspring1.genotype[d] = std::clamp(offspring1.genotype[d], bounds.lower[d], bounds.upper[d]);
                 }
+                if (dist_01(gen) < mutation_rate)
+                {
+                    std::normal_distribution<float> mut_dist(0.0f, gene_range[d] * 0.05f);
+                    offspring2.genotype[d] += mut_dist(gen);
+                    offspring2.genotype[d] = std::clamp(offspring2.genotype[d], bounds.lower[d], bounds.upper[d]);
+                }
+            }
 
-            offspring.phenotype = evaluate(offspring.genotype);
+            offspring1.phenotype = evaluate(offspring1.genotype);
+            next_population[i] = offspring1;
+            if (offspring1.phenotype < best_individual.phenotype)
+                best_individual = offspring1;
 
-            next_population[i] = offspring;
-
-            if (offspring.phenotype < best_individual.phenotype)
-                best_individual = offspring;
+            if (i + 1 < population_size)
+            {
+                offspring2.phenotype = evaluate(offspring2.genotype);
+                next_population[i + 1] = offspring2;
+                if (offspring2.phenotype < best_individual.phenotype)
+                    best_individual = offspring2;
+            }
         }
+
+        auto worst_it = std::max_element(next_population.begin(), next_population.end(),
+            [](const individual& a, const individual& b) {
+                return a.phenotype < b.phenotype;
+            });
+        *worst_it = prev_best;
 
         population = next_population;
 
@@ -117,5 +142,6 @@ optimization_result sga::optimize()
     optimization_result final_res;
     final_res.best_parameters = best_individual.genotype;
     final_res.best_result = best_individual.phenotype;
+    final_res.n_evaluations = n_evaluations;
     return final_res;
 }

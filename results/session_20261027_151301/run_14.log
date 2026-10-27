@@ -1,0 +1,18 @@
+Running sga optimization...
+Starting 20 optimization runs for IHCP...
+
+--- Run 1 / 20 ---
+Iteration:   1/50  |  Best Fitness:   336.6844  |  Mean Error:   1.152423 K
+Iteration:   2/50  |  Best Fitness:   336.6844  |  Mean Error:   1.152423 K
+Iteration:   3/50  |  Best Fitness:    45.3590  |  Mean Error:   0.456617 K
+Iteration:   4/50  |  Best Fitness:    45.3590  |  Mean Error:   0.456617 K
+Iteration:   5/50  |  Best Fitness:    41.3579  |  Mean Error:   0.433192 K
+Iteration:   6/50  |  Best Fitness:    30.4147  |  Mean Error:   0.290205 K
+Iteration:   7/50  |  Best Fitness:    30.4147  |  Mean Error:   0.290205 K
+Iteration:   8/50  |  Best Fitness:    30.4147  |  Mean Error:   0.290205 K
+Iteration:   9/50  |  Best Fitness:    30.4147  |  Mean Error:   0.290205 K
+Iteration:  10/50  |  Best Fitness:    27.7546  |  Mean Error:   0.332654 K
+Iteration:  11/50  |  Best Fitness:    23.2970  |  Mean Error:   0.306459 K
+Iteration:  12/50  |  Best Fitness:    22.9814  |  Mean Error:   0.290243 K
+Iteration:  13/50  |  Best Fitness:    22.9814  |  Mean Error:   0.290243 K
+Iteration:  14/50  |  Best Fitness:    22.9814  |  Mean Error:   0.290243 K

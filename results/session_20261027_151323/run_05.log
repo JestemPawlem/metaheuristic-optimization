@@ -1,0 +1,38 @@
+Running pso optimization...
+Starting 1 optimization runs for IHCP...
+
+--- Run 1 / 1 ---
+Iteration:   1/30  |  Best Fitness:  6439.2505  |  Mean Error:   3.880585 K
+Iteration:   2/30  |  Best Fitness:  3821.7554  |  Mean Error:   3.719024 K
+Iteration:   3/30  |  Best Fitness:  3821.7554  |  Mean Error:   3.719024 K
+Iteration:   4/30  |  Best Fitness:  3821.7554  |  Mean Error:   3.719024 K
+Iteration:   5/30  |  Best Fitness:  3635.6709  |  Mean Error:   3.191414 K
+Iteration:   6/30  |  Best Fitness:   799.9791  |  Mean Error:   1.961702 K
+Iteration:   7/30  |  Best Fitness:   396.8894  |  Mean Error:   1.029494 K
+Iteration:   8/30  |  Best Fitness:   396.8894  |  Mean Error:   1.029494 K
+Iteration:   9/30  |  Best Fitness:   396.8894  |  Mean Error:   1.029494 K
+Iteration:  10/30  |  Best Fitness:    63.4608  |  Mean Error:   0.535134 K
+Iteration:  11/30  |  Best Fitness:     7.0913  |  Mean Error:   0.183089 K
+Iteration:  12/30  |  Best Fitness:     7.0913  |  Mean Error:   0.183089 K
+Iteration:  13/30  |  Best Fitness:     0.3867  |  Mean Error:   0.029828 K
+Iteration:  14/30  |  Best Fitness:     0.3867  |  Mean Error:   0.029828 K
+Iteration:  15/30  |  Best Fitness:     0.3867  |  Mean Error:   0.029828 K
+Iteration:  16/30  |  Best Fitness:     0.3867  |  Mean Error:   0.029828 K
+Iteration:  17/30  |  Best Fitness:     0.3867  |  Mean Error:   0.029828 K
+Iteration:  18/30  |  Best Fitness:     0.3867  |  Mean Error:   0.029828 K
+Iteration:  19/30  |  Best Fitness:     0.3867  |  Mean Error:   0.029828 K
+Iteration:  20/30  |  Best Fitness:     0.3867  |  Mean Error:   0.029828 K
+Iteration:  21/30  |  Best Fitness:     0.3867  |  Mean Error:   0.029828 K
+Iteration:  22/30  |  Best Fitness:     0.3867  |  Mean Error:   0.029828 K
+Iteration:  23/30  |  Best Fitness:     0.3867  |  Mean Error:   0.029828 K
+Iteration:  24/30  |  Best Fitness:     0.2156  |  Mean Error:   0.025569 K
+Iteration:  25/30  |  Best Fitness:     0.0189  |  Mean Error:   0.007563 K
+Iteration:  26/30  |  Best Fitness:     0.0189  |  Mean Error:   0.007563 K
+Iteration:  27/30  |  Best Fitness:     0.0189  |  Mean Error:   0.007563 K
+Iteration:  28/30  |  Best Fitness:     0.0189  |  Mean Error:   0.007563 K
+Iteration:  29/30  |  Best Fitness:     0.0189  |  Mean Error:   0.007563 K
+Iteration:  30/30  |  Best Fitness:     0.0189  |  Mean Error:   0.007563 K
+
+===== EXPERIMENT COMPLETE [pso] =====
+Completed runs:            1
+Output file:               C:\Users\pnosz\Projects\IHCPOptimization\results\session_20261027_151323\run_05.csv

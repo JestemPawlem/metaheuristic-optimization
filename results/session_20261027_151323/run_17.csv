@@ -1,0 +1,2 @@
+algorithm,run,q,alpha,fitness,mean_error,n_evaluations
+pso,1,400000,3999.96,4.09782e-08,1.52588e-06,3660

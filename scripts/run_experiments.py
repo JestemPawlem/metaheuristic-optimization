@@ -4,11 +4,13 @@ from datetime import datetime
 from pathlib import Path
 import subprocess
 import sys
+import time
+
 import pandas as pd
 from tqdm import tqdm
 
 sys.path.append(str(Path(__file__).resolve().parent))
-from common import print_info, print_error
+from common import ROOT_DIR, print_info, print_error
 
 
 def run_experiment_task(task_args: list[str]) -> None:
@@ -26,35 +28,41 @@ def run_experiment_task(task_args: list[str]) -> None:
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Parallel IHCP optimization runner with tqdm progress tracking'
+        description='Parallel IHCP optimization runner with progress tracking'
     )
     parser.add_argument('--workers', type=int, default=None, help='Worker processes count (default: all CPU cores)')
-    parser.add_argument('--n-runs', type=int, default=5, help='Repetitions per configuration (default: 5)')
+    parser.add_argument('--n-runs', type=int, default=10, help='Repetitions per configuration (default: 10)')
     args = parser.parse_args()
 
-    project_root = Path(__file__).resolve().parent.parent
-    runner_script = project_root / 'scripts' / 'run_single.py'
+    runner_script = ROOT_DIR / 'scripts' / 'run_single.py'
 
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    session_dir = (project_root / 'results' / f'session_{timestamp}').resolve()
+    session_dir = (ROOT_DIR / 'results' / f'session_{timestamp}').resolve()
 
     configurations = [
         {'n_pop': 20, 'n_iter': 20},
+        {'n_pop': 25, 'n_iter': 25},
         {'n_pop': 30, 'n_iter': 30},
+        {'n_pop': 35, 'n_iter': 35},
         {'n_pop': 40, 'n_iter': 40},
+        {'n_pop': 45, 'n_iter': 45},
         {'n_pop': 50, 'n_iter': 50},
+        {'n_pop': 55, 'n_iter': 55},
+        {'n_pop': 60, 'n_iter': 60},
+    ]
+    optimizers = [
+        'pso', 'sga'
     ]
 
     tasks = []
     task_idx = 1
 
     for configuration in configurations:
-        for optimizer in ['pso', 'sga']:
-            run_id = f'{task_idx:02d}'
+        for optimizer in optimizers:
             task_cmd = [
                 str(runner_script),
                 '--session-dir', str(session_dir),
-                '--run-id', run_id,
+                '--run-id', f'{task_idx:02d}',
                 '--optimizer', optimizer,
                 '--n-runs', str(args.n_runs),
                 '--n-pop', str(configuration['n_pop']),
@@ -72,6 +80,7 @@ def main():
     print_info(f'Session directory: {session_dir.name}')
     print_info(f'Queued {len(tasks)} tasks...\n')
 
+    start_time = time.perf_counter();
     with ProcessPoolExecutor(max_workers=args.workers) as executor:
         futures = [executor.submit(run_experiment_task, t) for t in tasks]
 
@@ -82,6 +91,9 @@ def main():
             for future in as_completed(futures):
                 future.result()
                 pbar.update()
+    elapsed = time.perf_counter() - start_time
+    minutes, seconds = divmod(int(elapsed), 60)
+    print_info(f'Experiments took {minutes:02d}m {seconds:02d}s')
 
     csv_files = sorted(session_dir.glob('run_*.csv'))
     if not csv_files:

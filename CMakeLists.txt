@@ -13,3 +13,9 @@ add_executable(ihcp_optimizer
     src/csv_logger.cpp)
 
 target_include_directories(ihcp_optimizer PRIVATE include)
+
+if(MSVC)
+    target_compile_options(ihcp_optimizer PRIVATE /O2 /fp:fast /arch:AVX2)
+else()
+    target_compile_options(ihcp_optimizer PRIVATE -O3 -ffast-math -march=native)
+endif()

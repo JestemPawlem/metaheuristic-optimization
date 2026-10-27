@@ -1,0 +1,33 @@
+Running pso optimization...
+Starting 1 optimization runs for IHCP...
+
+--- Run 1 / 1 ---
+Iteration:   1/25  |  Best Fitness:  4561.5122  |  Mean Error:   3.427311 K
+Iteration:   2/25  |  Best Fitness:  4561.5122  |  Mean Error:   3.427311 K
+Iteration:   3/25  |  Best Fitness:  2449.5413  |  Mean Error:   2.366285 K
+Iteration:   4/25  |  Best Fitness:  2449.5413  |  Mean Error:   2.366285 K
+Iteration:   5/25  |  Best Fitness:  1990.7136  |  Mean Error:   2.806545 K
+Iteration:   6/25  |  Best Fitness:  1990.7136  |  Mean Error:   2.806545 K
+Iteration:   7/25  |  Best Fitness:  1990.7136  |  Mean Error:   2.806545 K
+Iteration:   8/25  |  Best Fitness:  1990.7136  |  Mean Error:   2.806545 K
+Iteration:   9/25  |  Best Fitness:  1382.1985  |  Mean Error:   2.359930 K
+Iteration:  10/25  |  Best Fitness:   311.3049  |  Mean Error:   1.086504 K
+Iteration:  11/25  |  Best Fitness:   275.1500  |  Mean Error:   1.125522 K
+Iteration:  12/25  |  Best Fitness:   182.8775  |  Mean Error:   0.665189 K
+Iteration:  13/25  |  Best Fitness:   182.8775  |  Mean Error:   0.665189 K
+Iteration:  14/25  |  Best Fitness:   182.8775  |  Mean Error:   0.665189 K
+Iteration:  15/25  |  Best Fitness:    17.2688  |  Mean Error:   0.289680 K
+Iteration:  16/25  |  Best Fitness:    17.2688  |  Mean Error:   0.289680 K
+Iteration:  17/25  |  Best Fitness:     3.6686  |  Mean Error:   0.094110 K
+Iteration:  18/25  |  Best Fitness:     3.6686  |  Mean Error:   0.094110 K
+Iteration:  19/25  |  Best Fitness:     3.6686  |  Mean Error:   0.094110 K
+Iteration:  20/25  |  Best Fitness:     3.6686  |  Mean Error:   0.094110 K
+Iteration:  21/25  |  Best Fitness:     1.5228  |  Mean Error:   0.078633 K
+Iteration:  22/25  |  Best Fitness:     1.5228  |  Mean Error:   0.078633 K
+Iteration:  23/25  |  Best Fitness:     1.5228  |  Mean Error:   0.078633 K
+Iteration:  24/25  |  Best Fitness:     1.1544  |  Mean Error:   0.073638 K
+Iteration:  25/25  |  Best Fitness:     1.1544  |  Mean Error:   0.073638 K
+
+===== EXPERIMENT COMPLETE [pso] =====
+Completed runs:            1
+Output file:               C:\Users\pnosz\Projects\IHCPOptimization\results\session_20261027_151323\run_03.csv

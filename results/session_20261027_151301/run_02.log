@@ -1,0 +1,44 @@
+Running sga optimization...
+Starting 20 optimization runs for IHCP...
+
+--- Run 1 / 20 ---
+Iteration:   1/20  |  Best Fitness: 14803.3408  |  Mean Error:   5.944139 K
+Iteration:   2/20  |  Best Fitness: 14803.3408  |  Mean Error:   5.944139 K
+Iteration:   3/20  |  Best Fitness: 14803.3408  |  Mean Error:   5.944139 K
+Iteration:   4/20  |  Best Fitness: 14803.3408  |  Mean Error:   5.944139 K
+Iteration:   5/20  |  Best Fitness: 14271.9307  |  Mean Error:   5.901085 K
+Iteration:   6/20  |  Best Fitness: 14271.9307  |  Mean Error:   5.901085 K
+Iteration:   7/20  |  Best Fitness: 11977.7959  |  Mean Error:   5.769495 K
+Iteration:   8/20  |  Best Fitness:  9834.4473  |  Mean Error:   5.704479 K
+Iteration:   9/20  |  Best Fitness:  9037.7324  |  Mean Error:   5.740415 K
+Iteration:  10/20  |  Best Fitness:  8863.4854  |  Mean Error:   6.010257 K
+Iteration:  11/20  |  Best Fitness:  8863.4854  |  Mean Error:   6.010257 K
+Iteration:  12/20  |  Best Fitness:  6888.0439  |  Mean Error:   4.469348 K
+Iteration:  13/20  |  Best Fitness:  6888.0439  |  Mean Error:   4.469348 K
+Iteration:  14/20  |  Best Fitness:  6222.4976  |  Mean Error:   5.055515 K
+Iteration:  15/20  |  Best Fitness:  6222.4976  |  Mean Error:   5.055515 K
+Iteration:  16/20  |  Best Fitness:  6222.4976  |  Mean Error:   5.055515 K
+Iteration:  17/20  |  Best Fitness:  5858.4302  |  Mean Error:   4.774046 K
+Iteration:  18/20  |  Best Fitness:  5826.5693  |  Mean Error:   3.732464 K
+Iteration:  19/20  |  Best Fitness:  5826.5693  |  Mean Error:   3.732464 K
+Iteration:  20/20  |  Best Fitness:  4681.2544  |  Mean Error:   3.563381 K
+
+--- Run 2 / 20 ---
+Iteration:   1/20  |  Best Fitness: 13061.7480  |  Mean Error:   6.110420 K
+Iteration:   2/20  |  Best Fitness: 10477.9824  |  Mean Error:   6.797415 K
+Iteration:   3/20  |  Best Fitness:  8305.2188  |  Mean Error:   4.292631 K
+Iteration:   4/20  |  Best Fitness:  6829.6147  |  Mean Error:   3.906838 K
+Iteration:   5/20  |  Best Fitness:  4970.8569  |  Mean Error:   3.392949 K
+Iteration:   6/20  |  Best Fitness:  4970.8569  |  Mean Error:   3.392949 K
+Iteration:   7/20  |  Best Fitness:  4970.8569  |  Mean Error:   3.392949 K
+Iteration:   8/20  |  Best Fitness:  4471.7026  |  Mean Error:   3.353752 K
+Iteration:   9/20  |  Best Fitness:  4471.7026  |  Mean Error:   3.353752 K
+Iteration:  10/20  |  Best Fitness:  4384.9897  |  Mean Error:   4.172307 K
+Iteration:  11/20  |  Best Fitness:  3902.2656  |  Mean Error:   3.855468 K
+Iteration:  12/20  |  Best Fitness:  3819.3198  |  Mean Error:   3.532683 K
+Iteration:  13/20  |  Best Fitness:  3771.7520  |  Mean Error:   3.639255 K
+Iteration:  14/20  |  Best Fitness:  3768.1414  |  Mean Error:   3.595649 K
+Iteration:  15/20  |  Best Fitness:  3740.9287  |  Mean Error:   3.638947 K
+Iteration:  16/20  |  Best Fitness:  3740.9287  |  Mean Error:   3.638947 K
+Iteration:  17/20  |  Best Fitness:  3317.8589  |  Mean Error:   2.801555 K
+Iteration:  18/20  |  Best Fitness:  3296.2881  |  Mean Error:   2.814011 K

@@ -2,14 +2,11 @@ import argparse
 from pathlib import Path
 import subprocess
 import sys
+import time
 import uuid
 
 sys.path.append(str(Path(__file__).resolve().parent))
-from common import print_error
-
-
-ROOT_DIR = Path(__file__).resolve().parent.parent
-EXE_PATH = ROOT_DIR / 'out' / 'build' / 'x64-Release' / 'ihcp_optimizer.exe'
+from common import print_error, print_info, ROOT_DIR, EXE_PATH
 
 
 def generate_run_id() -> str:
@@ -65,6 +62,7 @@ def main():
         cmd.extend([str(args.crossover_rate), str(args.mutation_rate)])
 
     try:
+        start_time = time.perf_counter()
         with open(log_file_path, 'w', encoding='utf-8') as log_file:
             result = subprocess.run(
                 cmd,
@@ -72,6 +70,8 @@ def main():
                 stderr=subprocess.STDOUT,
                 text=True
             )
+        end_time = time.perf_counter()
+        print_info(f'Experiment took {end_time - start_time:.2f}s')
 
         if result.returncode != 0:
             print_error(

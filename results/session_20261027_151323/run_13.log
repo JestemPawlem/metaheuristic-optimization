@@ -1,0 +1,58 @@
+Running pso optimization...
+Starting 1 optimization runs for IHCP...
+
+--- Run 1 / 1 ---
+Iteration:   1/50  |  Best Fitness: 19544.7871  |  Mean Error:   7.385697 K
+Iteration:   2/50  |  Best Fitness: 11929.9873  |  Mean Error:   5.849559 K
+Iteration:   3/50  |  Best Fitness:  3668.5605  |  Mean Error:   3.406399 K
+Iteration:   4/50  |  Best Fitness:   351.4504  |  Mean Error:   1.258577 K
+Iteration:   5/50  |  Best Fitness:    34.3348  |  Mean Error:   0.409680 K
+Iteration:   6/50  |  Best Fitness:    34.3348  |  Mean Error:   0.409680 K
+Iteration:   7/50  |  Best Fitness:    34.3348  |  Mean Error:   0.409680 K
+Iteration:   8/50  |  Best Fitness:    34.3348  |  Mean Error:   0.409680 K
+Iteration:   9/50  |  Best Fitness:    33.4125  |  Mean Error:   0.296462 K
+Iteration:  10/50  |  Best Fitness:    24.4853  |  Mean Error:   0.239093 K
+Iteration:  11/50  |  Best Fitness:    24.4853  |  Mean Error:   0.239093 K
+Iteration:  12/50  |  Best Fitness:    10.5919  |  Mean Error:   0.223336 K
+Iteration:  13/50  |  Best Fitness:    10.5919  |  Mean Error:   0.223336 K
+Iteration:  14/50  |  Best Fitness:     2.3950  |  Mean Error:   0.107260 K
+Iteration:  15/50  |  Best Fitness:     2.3950  |  Mean Error:   0.107260 K
+Iteration:  16/50  |  Best Fitness:     2.3950  |  Mean Error:   0.107260 K
+Iteration:  17/50  |  Best Fitness:     2.3950  |  Mean Error:   0.107260 K
+Iteration:  18/50  |  Best Fitness:     2.3950  |  Mean Error:   0.107260 K
+Iteration:  19/50  |  Best Fitness:     2.3950  |  Mean Error:   0.107260 K
+Iteration:  20/50  |  Best Fitness:     2.3950  |  Mean Error:   0.107260 K
+Iteration:  21/50  |  Best Fitness:     2.3950  |  Mean Error:   0.107260 K
+Iteration:  22/50  |  Best Fitness:     1.7363  |  Mean Error:   0.067279 K
+Iteration:  23/50  |  Best Fitness:     1.7363  |  Mean Error:   0.067279 K
+Iteration:  24/50  |  Best Fitness:     1.7363  |  Mean Error:   0.067279 K
+Iteration:  25/50  |  Best Fitness:     1.7363  |  Mean Error:   0.067279 K
+Iteration:  26/50  |  Best Fitness:     1.7363  |  Mean Error:   0.067279 K
+Iteration:  27/50  |  Best Fitness:     1.7363  |  Mean Error:   0.067279 K
+Iteration:  28/50  |  Best Fitness:     1.7363  |  Mean Error:   0.067279 K
+Iteration:  29/50  |  Best Fitness:     0.2020  |  Mean Error:   0.029015 K
+Iteration:  30/50  |  Best Fitness:     0.2020  |  Mean Error:   0.029015 K
+Iteration:  31/50  |  Best Fitness:     0.1343  |  Mean Error:   0.017974 K
+Iteration:  32/50  |  Best Fitness:     0.1343  |  Mean Error:   0.017974 K
+Iteration:  33/50  |  Best Fitness:     0.1343  |  Mean Error:   0.017974 K
+Iteration:  34/50  |  Best Fitness:     0.1343  |  Mean Error:   0.017974 K
+Iteration:  35/50  |  Best Fitness:     0.1343  |  Mean Error:   0.017974 K
+Iteration:  36/50  |  Best Fitness:     0.0964  |  Mean Error:   0.021725 K
+Iteration:  37/50  |  Best Fitness:     0.0459  |  Mean Error:   0.015011 K
+Iteration:  38/50  |  Best Fitness:     0.0075  |  Mean Error:   0.005387 K
+Iteration:  39/50  |  Best Fitness:     0.0075  |  Mean Error:   0.005387 K
+Iteration:  40/50  |  Best Fitness:     0.0075  |  Mean Error:   0.005387 K
+Iteration:  41/50  |  Best Fitness:     0.0075  |  Mean Error:   0.005387 K
+Iteration:  42/50  |  Best Fitness:     0.0046  |  Mean Error:   0.003305 K
+Iteration:  43/50  |  Best Fitness:     0.0026  |  Mean Error:   0.002771 K
+Iteration:  44/50  |  Best Fitness:     0.0026  |  Mean Error:   0.002771 K
+Iteration:  45/50  |  Best Fitness:     0.0026  |  Mean Error:   0.002771 K
+Iteration:  46/50  |  Best Fitness:     0.0026  |  Mean Error:   0.002771 K
+Iteration:  47/50  |  Best Fitness:     0.0019  |  Mean Error:   0.002967 K
+Iteration:  48/50  |  Best Fitness:     0.0019  |  Mean Error:   0.002967 K
+Iteration:  49/50  |  Best Fitness:     0.0019  |  Mean Error:   0.002950 K
+Iteration:  50/50  |  Best Fitness:     0.0019  |  Mean Error:   0.002950 K
+
+===== EXPERIMENT COMPLETE [pso] =====
+Completed runs:            1
+Output file:               C:\Users\pnosz\Projects\IHCPOptimization\results\session_20261027_151323\run_13.csv

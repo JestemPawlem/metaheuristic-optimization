@@ -1,0 +1,28 @@
+Running sga optimization...
+Starting 1 optimization runs for IHCP...
+
+--- Run 1 / 1 ---
+Iteration:   1/20  |  Best Fitness:  4484.5894  |  Mean Error:   4.263061 K
+Iteration:   2/20  |  Best Fitness:  4484.5894  |  Mean Error:   4.263061 K
+Iteration:   3/20  |  Best Fitness:  4484.5894  |  Mean Error:   4.263061 K
+Iteration:   4/20  |  Best Fitness:  2530.7327  |  Mean Error:   2.954200 K
+Iteration:   5/20  |  Best Fitness:  2530.7327  |  Mean Error:   2.954200 K
+Iteration:   6/20  |  Best Fitness:  2361.5461  |  Mean Error:   2.449789 K
+Iteration:   7/20  |  Best Fitness:  2361.5461  |  Mean Error:   2.449789 K
+Iteration:   8/20  |  Best Fitness:  2119.1619  |  Mean Error:   2.534105 K
+Iteration:   9/20  |  Best Fitness:  2119.1619  |  Mean Error:   2.534105 K
+Iteration:  10/20  |  Best Fitness:  1750.4906  |  Mean Error:   2.568305 K
+Iteration:  11/20  |  Best Fitness:  1632.1686  |  Mean Error:   2.477022 K
+Iteration:  12/20  |  Best Fitness:  1632.1686  |  Mean Error:   2.477022 K
+Iteration:  13/20  |  Best Fitness:  1632.1686  |  Mean Error:   2.477022 K
+Iteration:  14/20  |  Best Fitness:  1424.7230  |  Mean Error:   1.829686 K
+Iteration:  15/20  |  Best Fitness:  1375.7678  |  Mean Error:   2.027580 K
+Iteration:  16/20  |  Best Fitness:  1341.5331  |  Mean Error:   1.834588 K
+Iteration:  17/20  |  Best Fitness:  1341.5331  |  Mean Error:   1.834588 K
+Iteration:  18/20  |  Best Fitness:  1341.5331  |  Mean Error:   1.834588 K
+Iteration:  19/20  |  Best Fitness:  1341.5331  |  Mean Error:   1.834588 K
+Iteration:  20/20  |  Best Fitness:  1049.2385  |  Mean Error:   2.002618 K
+
+===== EXPERIMENT COMPLETE [sga] =====
+Completed runs:            1
+Output file:               C:\Users\pnosz\Projects\IHCPOptimization\results\session_20261027_151323\run_02.csv

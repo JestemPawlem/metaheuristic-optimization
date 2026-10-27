@@ -21,12 +21,10 @@ void ihcp_model::thomas_algorithm(
     const std::vector<float>& b,
     const std::vector<float>& c,
     const std::vector<float>& d,
+    std::vector<float>& beta,
+    std::vector<float>& gamma,
     std::vector<float>& wx) const
 {
-    int size = static_cast<int>(wx.size());
-    std::vector<float> beta(size, 0.0f);
-    std::vector<float> gamma(size, 0.0f);
-
     if (b[1] == 0.0f)
         return;
 
@@ -35,12 +33,10 @@ void ihcp_model::thomas_algorithm(
 
     for (int j = 2; j <= dim - 1; ++j)
     {
-        float denom = a[j] * beta[j - 1] + b[j];
-        if (std::abs(denom) < 1e-12f)
-            denom = 1e-12f;
+        float inv_denom = 1.0f / (a[j] * beta[j - 1] + b[j]);
 
-        beta[j] = -c[j] / denom;
-        gamma[j] = (d[j] - a[j] * gamma[j - 1]) / denom;
+        beta[j] = -c[j] * inv_denom;
+        gamma[j] = (d[j] - a[j] * gamma[j - 1]) * inv_denom;
     }
 
     float last_denom = a[dim] * beta[dim - 1] + b[dim];
@@ -90,15 +86,17 @@ void ihcp_model::run_simulation(
     float a2 = lambda2 / param2;
     float dx = (end_pos - start_pos) / (quantity - 1);
 
-    int sz = quantity + 2;
-    std::vector<float> enthalpy(sz, 0.0f);
-    std::vector<float> u(sz, 0.0f);
-    std::vector<float> r(sz, 0.0f);
-    std::vector<float> temp(sz, pouring_temp);
-    std::vector<float> aa(sz, 0.0f);
-    std::vector<float> bb(sz, 0.0f);
-    std::vector<float> cc(sz, 0.0f);
-    std::vector<float> ff(sz, 0.0f);
+    int size = quantity + 2;
+    std::vector<float> enthalpy(size);
+    std::vector<float> u(size);
+    std::vector<float> r(size);
+    std::vector<float> temp(size, pouring_temp);
+    std::vector<float> aa(size);
+    std::vector<float> bb(size);
+    std::vector<float> cc(size);
+    std::vector<float> ff(size);
+    std::vector<float> beta(size);
+    std::vector<float> gamma(size);
 
     float time = 0.0f;
     float H1 = param2 * solid_temp;
@@ -168,7 +166,7 @@ void ihcp_model::run_simulation(
             ff[quantity] = ((lambda1 * dx) / (2.0f * a1 * tau)) * u[quantity] + aq_i * d_i(1, enthalpy[quantity], H1, param1, param2, time);
         }
 
-        thomas_algorithm(quantity, aa, bb, cc, ff, u);
+        thomas_algorithm(quantity, aa, bb, cc, ff, beta, gamma, u);
         for (int i = 1; i <= quantity; ++i)
             enthalpy[i] = u[i] + r[i];
 
@@ -213,7 +211,7 @@ void ihcp_model::run_simulation(
             ff[quantity] = ((lambda2 * dx) / (2.0f * a2 * tau)) * u[quantity] + aq_i * d_i(2, enthalpy[quantity], H1, param1, param2, time);
         }
 
-        thomas_algorithm(quantity, aa, bb, cc, ff, u);
+        thomas_algorithm(quantity, aa, bb, cc, ff, beta, gamma, u);
         for (int i = 1; i <= quantity; ++i)
             enthalpy[i] = u[i] + r[i];
 

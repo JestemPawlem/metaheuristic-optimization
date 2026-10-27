@@ -24,10 +24,10 @@ int main(int argc, char* argv[])
 
     std::filesystem::path session_dir = "results";
     std::string run_id = "0";
-    std::string algorithm = "pso";
+    std::string algorithm = "sga";
     std::size_t n_runs = 5;
-    std::size_t population_size = 20;
-    std::size_t n_iterations = 20;
+    std::size_t population_size = 30;
+    std::size_t n_iterations = 30;
 
     const ihcp_bounds bounds{
         { 100'000.0f, 1'000.0f },

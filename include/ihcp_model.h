@@ -48,6 +48,8 @@ private:
         const std::vector<float>& b,
         const std::vector<float>& c,
         const std::vector<float>& d,
+        std::vector<float>& beta,
+        std::vector<float>& gamma,
         std::vector<float>& wx) const;
 
     float temperature_from_enthalpy(float enthalpy, float H1, float H2, float time) const;
