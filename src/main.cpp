@@ -26,8 +26,8 @@ int main(int argc, char* argv[])
     std::string run_id = "0";
     std::string algorithm = "sga";
     std::size_t n_runs = 5;
-    std::size_t population_size = 30;
-    std::size_t n_iterations = 30;
+    std::size_t population_size = 15;
+    std::size_t n_iterations = 60;
 
     const ihcp_bounds bounds{
         { 100'000.0f, 1'000.0f },
@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
 
         factory = [&]()
             {
-                return std::make_unique<pso>(
+                return std::make_unique<particle_swarm_optimization>(
                     model,
                     population_size,
                     n_iterations,
@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
 
         factory = [&]()
             {
-                return std::make_unique<sga>(
+                return std::make_unique<simple_genetic_algorithm>(
                     model,
                     population_size,
                     n_iterations,

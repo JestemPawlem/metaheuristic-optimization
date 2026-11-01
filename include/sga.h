@@ -10,10 +10,10 @@
 #include "optimizer.h"
 
 
-class sga : public optimizer
+class simple_genetic_algorithm : public optimizer
 {
 public:
-    sga(
+    simple_genetic_algorithm(
         const ihcp_model& model,
         std::size_t population_size,
         std::size_t n_iterations,

@@ -10,7 +10,7 @@ add_executable(ihcp_optimizer
     src/ihcp_model.cpp
     src/run_experiment.cpp
     src/sga.cpp
-    src/csv_logger.cpp)
+    src/csv_logger.cpp "include/cs.h" "src/cs.cpp")
 
 target_include_directories(ihcp_optimizer PRIVATE include)
 

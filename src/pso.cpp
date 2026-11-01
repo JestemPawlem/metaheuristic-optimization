@@ -8,7 +8,7 @@
 #include "pso.h"
 
 
-pso::pso(
+particle_swarm_optimization::particle_swarm_optimization(
     const ihcp_model& model,
     std::size_t population_size,
     std::size_t n_iterations,
@@ -26,7 +26,7 @@ pso::pso(
 {}
 
 
-optimization_result pso::optimize()
+optimization_result particle_swarm_optimization::optimize()
 {
     std::size_t n_evaluations{};
     auto evaluate = [&](const ihcp_parameters& params)

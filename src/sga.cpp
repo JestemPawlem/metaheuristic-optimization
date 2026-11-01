@@ -7,7 +7,7 @@
 #include "ihcp_model.h"
 #include "sga.h"
 
-sga::sga(
+simple_genetic_algorithm::simple_genetic_algorithm(
     const ihcp_model& model,
     std::size_t population_size,
     std::size_t n_iterations,
@@ -22,7 +22,7 @@ sga::sga(
     bounds(bounds)
 {}
 
-optimization_result sga::optimize()
+optimization_result simple_genetic_algorithm::optimize()
 {
     std::size_t n_evaluations{};
     auto evaluate = [&](const ihcp_parameters& params)
@@ -62,8 +62,17 @@ optimization_result sga::optimize()
 
     std::vector<individual> next_population(population_size);
 
+    std::size_t stagnation_counter{};
+    constexpr std::size_t max_stagnation{ 5 };
+    float last_best_fitness = best_individual.phenotype.fitness;
+
     for (std::size_t iter{}; iter < n_iterations; ++iter)
     {
+        float current_mutation_rate = mutation_rate;
+
+        if (stagnation_counter >= max_stagnation)
+            current_mutation_rate = mutation_rate * 2.0f;
+
         individual prev_best = best_individual;
 
         for (std::size_t i{ 0 }; i < population_size; i += 2)
@@ -82,9 +91,9 @@ optimization_result sga::optimize()
 
             if (dist_01(gen) < crossover_rate)
             {
-                float gamma = dist_01(gen);
                 for (std::size_t d{}; d < 2; ++d)
                 {
+                    float gamma = dist_01(gen);
                     offspring1.genotype[d] = gamma * parent1.genotype[d] + (1.0f - gamma) * parent2.genotype[d];
                     offspring2.genotype[d] = (1.0f - gamma) * parent1.genotype[d] + gamma * parent2.genotype[d];
                 }
@@ -97,15 +106,17 @@ optimization_result sga::optimize()
 
             for (std::size_t d{}; d < 2; ++d)
             {
-                if (dist_01(gen) < mutation_rate)
+                float sigma = gene_range[d] * 0.05f;
+
+                if (dist_01(gen) < current_mutation_rate)
                 {
-                    std::normal_distribution<float> mut_dist(0.0f, gene_range[d] * 0.05f);
+                    std::normal_distribution<float> mut_dist(0.0f, sigma);
                     offspring1.genotype[d] += mut_dist(gen);
                     offspring1.genotype[d] = std::clamp(offspring1.genotype[d], bounds.lower[d], bounds.upper[d]);
                 }
-                if (dist_01(gen) < mutation_rate)
+                if (dist_01(gen) < current_mutation_rate)
                 {
-                    std::normal_distribution<float> mut_dist(0.0f, gene_range[d] * 0.05f);
+                    std::normal_distribution<float> mut_dist(0.0f, sigma);
                     offspring2.genotype[d] += mut_dist(gen);
                     offspring2.genotype[d] = std::clamp(offspring2.genotype[d], bounds.lower[d], bounds.upper[d]);
                 }
@@ -130,6 +141,16 @@ optimization_result sga::optimize()
                 return a.phenotype < b.phenotype;
             });
         *worst_it = prev_best;
+
+        if (last_best_fitness == best_individual.phenotype.fitness)
+        {
+            stagnation_counter = 0;
+            last_best_fitness = best_individual.phenotype.fitness;
+        }
+        else
+        {
+            ++stagnation_counter;
+        }
 
         population = next_population;
 

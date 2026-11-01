@@ -19,3 +19,5 @@ compile_commands.json
 # Python
 __pycache__/
 *.pyc
+
+results/

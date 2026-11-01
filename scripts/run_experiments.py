@@ -40,15 +40,11 @@ def main():
     session_dir = (ROOT_DIR / 'results' / f'session_{timestamp}').resolve()
 
     configurations = [
-        {'n_pop': 20, 'n_iter': 20},
-        {'n_pop': 25, 'n_iter': 25},
-        {'n_pop': 30, 'n_iter': 30},
-        {'n_pop': 35, 'n_iter': 35},
-        {'n_pop': 40, 'n_iter': 40},
-        {'n_pop': 45, 'n_iter': 45},
-        {'n_pop': 50, 'n_iter': 50},
-        {'n_pop': 55, 'n_iter': 55},
-        {'n_pop': 60, 'n_iter': 60},
+        {'n_pop': 10, 'n_iter': 40},
+        {'n_pop': 15, 'n_iter': 60},
+        {'n_pop': 20, 'n_iter': 80},
+        {'n_pop': 25, 'n_iter': 100},
+        {'n_pop': 30, 'n_iter': 120},
     ]
     optimizers = [
         'pso', 'sga'
@@ -93,7 +89,7 @@ def main():
                 pbar.update()
     elapsed = time.perf_counter() - start_time
     minutes, seconds = divmod(int(elapsed), 60)
-    print_info(f'Experiments took {minutes:02d}m {seconds:02d}s')
+    print_info(f'Experiments took {minutes:d}m {seconds:d}s')
 
     csv_files = sorted(session_dir.glob('run_*.csv'))
     if not csv_files:

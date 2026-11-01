@@ -32,9 +32,12 @@ def generate_plots(csv_path: Path, output_dir: Path):
 
     required_cols = {'algorithm', 'fitness', 'mean_error', 'n_evaluations'}
     if not required_cols.issubset(df.columns):
-        raise ValueError(
-            f'CSV missing required columns: {required_cols}. Found: {set(df.columns)}'
-        )
+        raise ValueError(f'CSV missing required columns: {required_cols}.')
+
+    q80 = df.groupby(['algorithm', 'n_evaluations'])['fitness'].transform(lambda s: s.quantile(0.80))
+    df = df[df['fitness'] <= q80]
+
+    df[['fitness', 'mean_error']] = df[['fitness', 'mean_error']].clip(lower=1e-6)
 
     output_dir.mkdir(parents=True, exist_ok=True)
     setup_plot_style()

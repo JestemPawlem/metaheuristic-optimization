@@ -10,10 +10,10 @@
 #include "optimizer.h"
 
 
-class pso : public optimizer
+class particle_swarm_optimization : public optimizer
 {
 public:
-    pso(
+    particle_swarm_optimization(
         const ihcp_model& model,
         std::size_t population_size,
         std::size_t n_iterations,
