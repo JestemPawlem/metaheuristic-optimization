@@ -1,27 +1,29 @@
 #pragma once
 
 #include <filesystem>
+#include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include "optimization_result.h"
 
-
 class csv_logger
 {
 public:
-	explicit csv_logger(
-		std::filesystem::path dir,
-		std::string_view run_id);
+    using hyperparam_list = std::vector<std::pair<std::string, std::string>>;
 
-	void log(
-		std::string_view algorithm,
-		const std::vector<optimization_result>& results) const;
+    csv_logger(std::filesystem::path dir, std::string_view run_id);
 
-	[[nodiscard]] const std::filesystem::path& path() const noexcept;
+    void log(
+        std::string_view algorithm,
+        const std::vector<optimization_result>& results,
+        const hyperparam_list& hyperparams) const;
+
+    [[nodiscard]] const std::filesystem::path& path() const noexcept;
 
 private:
-	std::filesystem::path path_;
+    std::filesystem::path path_;
 
-	void ensure_header();
+    void write_header(const hyperparam_list& hyperparams) const;
 };

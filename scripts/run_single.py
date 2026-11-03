@@ -12,6 +12,7 @@ from common import print_error, print_info, ROOT_DIR, EXE_PATH
 def generate_run_id() -> str:
     return uuid.uuid4().hex[:6]
 
+
 def generate_session_dir() -> Path:
     return ROOT_DIR / 'results' / f'results_{uuid.uuid4().hex[:6]}'
 
@@ -23,18 +24,20 @@ def main():
 
     parser.add_argument('--session-dir', type=str)
     parser.add_argument('--run-id', type=str)
-    parser.add_argument('--optimizer', type=str, default='pso', choices=['pso', 'sga'])
+    parser.add_argument('--optimizer', type=str, default='pso', choices=['pso', 'sga', 'cs'])
     parser.add_argument('--n-runs', type=int, default=1)
 
     parser.add_argument('--n-pop', type=int, default=30)
     parser.add_argument('--n-iter', type=int, default=30)
 
-    parser.add_argument('--inertia', type=float, default=0.7)
-    parser.add_argument('--c1', type=float, default=1.5)
-    parser.add_argument('--c2', type=float, default=1.5)
+    parser.add_argument('--pso-inertia', dest='pso_inertia', type=float, default=0.7)
+    parser.add_argument('--pso-c1', dest='pso_c1', type=float, default=1.5)
+    parser.add_argument('--pso-c2', dest='pso_c2', type=float, default=1.5)
 
-    parser.add_argument('--crossover-rate', type=float, default=0.8)
-    parser.add_argument('--mutation-rate', type=float, default=0.1)
+    parser.add_argument('--sga-crossover-rate', dest='sga_crossover_rate', type=float, default=0.8)
+    parser.add_argument('--sga-mutation-rate', dest='sga_mutation_rate', type=float, default=0.1)
+
+    parser.add_argument('--cs-pa', dest='cs_pa', type=float, default=0.25)
 
     args = parser.parse_args()
 
@@ -57,9 +60,11 @@ def main():
     ]
 
     if args.optimizer == 'pso':
-        cmd.extend([str(args.inertia), str(args.c1), str(args.c2)])
+        cmd.extend([str(args.pso_inertia), str(args.pso_c1), str(args.pso_c2)])
     elif args.optimizer == 'sga':
-        cmd.extend([str(args.crossover_rate), str(args.mutation_rate)])
+        cmd.extend([str(args.sga_crossover_rate), str(args.sga_mutation_rate)])
+    elif args.optimizer == 'cs':
+        cmd.extend([str(args.cs_pa)])
 
     try:
         start_time = time.perf_counter()

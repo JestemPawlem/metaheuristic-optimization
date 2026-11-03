@@ -16,6 +16,21 @@ def get_latest_session_dir(results_dir: Path) -> Path:
     return sessions[-1]
 
 
+def load_and_aggregate_data(session_dir: Path) -> pd.DataFrame:
+    csv_files = sorted(session_dir.glob('run_*.csv'))
+    if not csv_files:
+        raise FileNotFoundError(f'No run_*.csv files found in: {session_dir}')
+
+    df = pd.concat((pd.read_csv(f) for f in csv_files), ignore_index=True)
+    df = df.loc[:, ~df.columns.duplicated()].copy()
+
+    aggregated_path = session_dir / 'aggregated_results.csv'
+    df.to_csv(aggregated_path, index=False)
+    print_info(f'Aggregated {len(df)} rows from {len(csv_files)} files -> {aggregated_path.name}')
+
+    return df
+
+
 def setup_plot_style():
     sns.set_theme(style='whitegrid')
     plt.rcParams.update(
@@ -27,15 +42,20 @@ def setup_plot_style():
     )
 
 
-def generate_plots(csv_path: Path, output_dir: Path):
-    df = pd.read_csv(csv_path)
-
-    required_cols = {'algorithm', 'fitness', 'mean_error', 'n_evaluations'}
+def generate_plots(df: pd.DataFrame, output_dir: Path):
+    required_cols = {'algorithm', 'fitness', 'mean_error', 'n_evaluations', 'n_pop', 'n_iter'}
     if not required_cols.issubset(df.columns):
-        raise ValueError(f'CSV missing required columns: {required_cols}.')
+        raise ValueError(f'DataFrame missing required columns: {required_cols - set(df.columns)}')
+
+    df['n_evaluations'] = (
+        df.groupby(['algorithm', 'n_pop', 'n_iter'])['n_evaluations']
+        .transform('mean')
+        .round()
+        .astype(int)
+    )
 
     q80 = df.groupby(['algorithm', 'n_evaluations'])['fitness'].transform(lambda s: s.quantile(0.80))
-    df = df[df['fitness'] <= q80]
+    df = df[df['fitness'] <= q80].copy()
 
     df[['fitness', 'mean_error']] = df[['fitness', 'mean_error']].clip(lower=1e-6)
 
@@ -52,11 +72,7 @@ def generate_plots(csv_path: Path, output_dir: Path):
         ax=ax,
     )
     ax.set_yscale('log')
-    ax.set_title(
-        'Best Fitness vs Fitness Evaluations',
-        fontsize=12,
-        fontweight='bold',
-    )
+    ax.set_title('Best Fitness vs Fitness Evaluations', fontsize=12, fontweight='bold')
     ax.set_xlabel('Evaluations', fontsize=10)
     ax.set_ylabel('Best Fitness', fontsize=10)
     fig.tight_layout()
@@ -75,11 +91,7 @@ def generate_plots(csv_path: Path, output_dir: Path):
         ax=ax,
     )
     ax.set_yscale('log')
-    ax.set_title(
-        'Mean Error vs Fitness Evaluations',
-        fontsize=12,
-        fontweight='bold',
-    )
+    ax.set_title('Mean Error vs Fitness Evaluations', fontsize=12, fontweight='bold')
     ax.set_xlabel('Evaluations', fontsize=10)
     ax.set_ylabel('Mean Error', fontsize=10)
     fig.tight_layout()
@@ -95,7 +107,7 @@ def generate_plots(csv_path: Path, output_dir: Path):
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Generate benchmark metric plots for IHCP optimization'
+        description='Aggregate run results and generate benchmark metric plots for IHCP'
     )
     parser.add_argument(
         '--session-dir',
@@ -120,13 +132,9 @@ def main():
             if args.session_dir
             else get_latest_session_dir(results_dir)
         )
+        df = load_and_aggregate_data(session_dir)
     except FileNotFoundError as e:
         print_error(str(e))
-        sys.exit(1)
-
-    csv_file = session_dir / 'aggregated_results.csv'
-    if not csv_file.exists():
-        print_error(f'File not found: {csv_file}')
         sys.exit(1)
 
     artifacts_dir = (
@@ -135,7 +143,7 @@ def main():
         else session_dir / 'artifacts'
     )
 
-    generate_plots(csv_file, artifacts_dir)
+    generate_plots(df, artifacts_dir)
 
 
 if __name__ == '__main__':

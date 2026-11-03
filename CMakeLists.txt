@@ -6,11 +6,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(ihcp_optimizer
     src/main.cpp 
-    src/pso.cpp
+    "src/optimizers/pso.cpp"
     src/ihcp_model.cpp
     src/run_experiment.cpp
-    src/sga.cpp
-    src/csv_logger.cpp "include/cs.h" "src/cs.cpp")
+    "src/optimizers/sga.cpp"
+    src/csv_logger.cpp "include/optimizers/cs.h" "src/optimizers/cs.cpp" "include/optimizers/optimizer_factory.h" "src/optimizers/optimizer_factory.cpp")
 
 target_include_directories(ihcp_optimizer PRIVATE include)
 

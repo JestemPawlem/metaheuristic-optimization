@@ -47,7 +47,7 @@ def main():
         {'n_pop': 30, 'n_iter': 120},
     ]
     optimizers = [
-        'pso', 'sga'
+        'pso', 'sga', 'cs'
     ]
 
     tasks = []
@@ -64,11 +64,6 @@ def main():
                 '--n-pop', str(configuration['n_pop']),
                 '--n-iter', str(configuration['n_iter'])
             ]
-
-            if optimizer == 'pso':
-                task_cmd.extend(['--inertia', '0.7', '--c1', '1.5', '--c2', '1.5'])
-            elif optimizer == 'sga':
-                task_cmd.extend(['--crossover-rate', '0.8', '--mutation-rate', '0.1'])
 
             tasks.append(task_cmd)
             task_idx += 1
@@ -90,17 +85,6 @@ def main():
     elapsed = time.perf_counter() - start_time
     minutes, seconds = divmod(int(elapsed), 60)
     print_info(f'Experiments took {minutes:d}m {seconds:d}s')
-
-    csv_files = sorted(session_dir.glob('run_*.csv'))
-    if not csv_files:
-        print_error('No output CSV files were generated.', file=sys.stderr)
-        sys.exit(1)
-
-    df = pd.concat((pd.read_csv(f) for f in csv_files), ignore_index=True)
-    summary_file = session_dir / 'aggregated_results.csv'
-    df.to_csv(summary_file, index=False)
-
-    print_info(f'\nAggregated {len(df)} runs from {len(csv_files)} files into {summary_file.name}')
 
 
 if __name__ == '__main__':

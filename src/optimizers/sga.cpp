@@ -5,21 +5,21 @@
 #include <vector>
 
 #include "ihcp_model.h"
-#include "sga.h"
+#include "optimizers/sga.h"
 
 simple_genetic_algorithm::simple_genetic_algorithm(
     const ihcp_model& model,
+    ihcp_bounds bounds,
     std::size_t population_size,
     std::size_t n_iterations,
     float crossover_rate,
-    float mutation_rate,
-    ihcp_bounds bounds) :
+    float mutation_rate) :
     model(model),
+    bounds(bounds),
     population_size(population_size),
     n_iterations(n_iterations),
     crossover_rate(crossover_rate),
-    mutation_rate(mutation_rate),
-    bounds(bounds)
+    mutation_rate(mutation_rate)
 {}
 
 optimization_result simple_genetic_algorithm::optimize()

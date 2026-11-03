@@ -5,24 +5,24 @@
 #include <vector>
 
 #include "ihcp_model.h"
-#include "pso.h"
+#include "optimizers/pso.h"
 
 
 particle_swarm_optimization::particle_swarm_optimization(
     const ihcp_model& model,
+    ihcp_bounds bounds,
     std::size_t population_size,
     std::size_t n_iterations,
     float inertia,
     float c1,
-    float c2,
-    ihcp_bounds bounds) :
+    float c2) :
     model(model),
+    bounds(bounds),
     population_size(population_size),
     n_iterations(n_iterations),
     inertia(inertia),
     c1(c1),
-    c2(c2),
-    bounds(bounds)
+    c2(c2)
 {}
 
 

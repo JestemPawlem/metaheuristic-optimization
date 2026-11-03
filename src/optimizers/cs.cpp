@@ -7,19 +7,20 @@
 #include <vector>
 
 #include "ihcp_model.h"
-#include "cs.h"
+#include "optimizers/cs.h"
+
 
 cuckoo_search::cuckoo_search(
     const ihcp_model& model,
+    ihcp_bounds bounds,
     std::size_t population_size,
     std::size_t n_iterations,
-    float pa,
-    ihcp_bounds bounds) :
+    float pa) :
     model(model),
+    bounds(bounds),
     population_size(population_size),
     n_iterations(n_iterations),
-    pa(pa),
-    bounds(bounds)
+    pa(pa)
 {}
 
 optimization_result cuckoo_search::optimize()
@@ -36,18 +37,14 @@ optimization_result cuckoo_search::optimize()
 
     std::array<std::uniform_real_distribution<float>, 2> dist_pos;
     for (std::size_t d{}; d < 2; ++d)
-    {
         dist_pos[d] = std::uniform_real_distribution<float>(bounds.lower[d], bounds.upper[d]);
-    }
 
     std::uniform_real_distribution<float> dist_01(0.0f, 1.0f);
     std::uniform_int_distribution<std::size_t> dist_idx(0, population_size - 1);
-    std::normal_distribution<float> dist_randn(0.0f, 1.0f);
 
-    // Parametry dla lotów Lévy'ego (Algorytm Mantegny)
-    const float beta = 1.5f;
+    constexpr float beta = 1.5f;
     const float sigma_u = std::pow(
-        (std::tgamma(1.0f + beta) * std::sin(std::numbers::pi_v<float> *beta / 2.0f)) /
+        (std::tgamma(1.0f + beta) * std::sin(std::numbers::pi_v<float> * beta / 2.0f)) /
         (std::tgamma((1.0f + beta) / 2.0f) * beta * std::pow(2.0f, (beta - 1.0f) / 2.0f)),
         1.0f / beta
     );
@@ -58,7 +55,6 @@ optimization_result cuckoo_search::optimize()
     std::vector<nest> population(population_size);
     nest best_nest;
 
-    // 1. Inicjalizacja gniazd
     for (std::size_t i{}; i < population_size; ++i)
     {
         for (std::size_t d{}; d < 2; ++d)
@@ -66,14 +62,12 @@ optimization_result cuckoo_search::optimize()
 
         population[i].phenotype = evaluate(population[i].position);
 
-        if (i == 0 || population[i].phenotype < best_nest.phenotype)
+        if (population[i].phenotype < best_nest.phenotype)
             best_nest = population[i];
     }
 
-    // 2. Główna pętla optymalizacji
     for (std::size_t iter{}; iter < n_iterations; ++iter)
     {
-        // Krok 1: Generowanie nowych rozwiązań za pomocą Lotów Lévy'ego
         for (std::size_t i{}; i < population_size; ++i)
         {
             ihcp_parameters new_pos{};
@@ -84,16 +78,14 @@ optimization_result cuckoo_search::optimize()
                 float v = dist_v(gen);
                 float levy_step = u / std::pow(std::abs(v), 1.0f / beta);
 
-                // Mnożnik kroku (0.01) dostosowany do dystansu do najlepszego gniazda
-                float step_size = 0.01f * levy_step * (population[i].position[d] - best_nest.position[d]);
+                float step_size = 0.3f * levy_step * (population[i].position[d] - best_nest.position[d]);
 
-                new_pos[d] = population[i].position[d] + step_size * dist_randn(gen);
+                new_pos[d] = population[i].position[d] + step_size;
                 new_pos[d] = std::clamp(new_pos[d], bounds.lower[d], bounds.upper[d]);
             }
 
             ihcp_result result = evaluate(new_pos);
 
-            // Selekcja zachłanna (elitarna)
             if (result < population[i].phenotype)
             {
                 population[i].position = new_pos;
@@ -104,7 +96,7 @@ optimization_result cuckoo_search::optimize()
             }
         }
 
-        // Krok 2: Odkrywanie obcych jaj (eksploatacja różnicowa)
+        // Krok 2: Odkrywanie obcych jaj (samoadaptująca mutacja różnicowa DE/rand/1)
         for (std::size_t i{}; i < population_size; ++i)
         {
             if (dist_01(gen) < pa)
@@ -118,7 +110,6 @@ optimization_result cuckoo_search::optimize()
                 ihcp_parameters new_pos{};
                 for (std::size_t d{}; d < 2; ++d)
                 {
-                    // Random Walk skierowany przez różnicę dwóch innych gniazd
                     new_pos[d] = population[i].position[d] + dist_01(gen) * (population[j].position[d] - population[k].position[d]);
                     new_pos[d] = std::clamp(new_pos[d], bounds.lower[d], bounds.upper[d]);
                 }

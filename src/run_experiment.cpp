@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "ihcp_model.h"
-#include "optimizer.h"
+#include "optimizers/optimizer.h"
 #include "run_experiment.h"
 
 

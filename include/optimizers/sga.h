@@ -10,38 +10,31 @@
 #include "optimizer.h"
 
 
-class particle_swarm_optimization : public optimizer
+class simple_genetic_algorithm : public optimizer
 {
 public:
-    particle_swarm_optimization(
+    simple_genetic_algorithm(
         const ihcp_model& model,
+        ihcp_bounds bounds,
         std::size_t population_size,
         std::size_t n_iterations,
-        float inertia,
-        float c1,
-        float c2,
-        ihcp_bounds bounds
-    );
+        float crossover_rate,
+        float mutation_rate);
 
     optimization_result optimize() override;
 
 private:
     const ihcp_model& model;
+    ihcp_bounds bounds;
 
     std::size_t population_size;
     std::size_t n_iterations;
+    float crossover_rate;
+    float mutation_rate;
 
-    float inertia;
-    float c1;
-    float c2;
-
-    ihcp_bounds bounds;
-
-    struct particle
+    struct individual
     {
-        ihcp_parameters position{};
-        ihcp_parameters velocity{};
-        ihcp_parameters best_position{};
-        ihcp_result best_result{};
+        ihcp_parameters genotype{};
+        ihcp_result phenotype{};
     };
 };
