@@ -3,13 +3,13 @@
 #include <print>
 #include <span>
 #include <string>
-#include <vector>
 
 #include "csv_logger.h"
 #include "ihcp_bounds.h"
 #include "ihcp_model.h"
 #include "optimization_result.h"
 #include "optimizers/optimizer_factory.h"
+#include "random.h"
 #include "run_experiment.h"
 
 
@@ -17,9 +17,11 @@ int main(int argc, char* argv[])
 {
     std::system("chcp 65001 > nul");
 
+    rng::set_seed(0);
+
     std::filesystem::path session_dir = "results";
     std::string run_id = "0";
-    std::string algorithm = "cs";
+    std::string algorithm = "pso";
     std::size_t n_runs = 5;
 
     const ihcp_bounds bounds{
@@ -32,7 +34,7 @@ int main(int argc, char* argv[])
     if (argc > 3) algorithm = argv[3];
     if (argc > 4) n_runs = std::stoul(argv[4]);
 
-    ihcp_model model{};
+    ihcp_model model(0.03f);
 
     try
     {

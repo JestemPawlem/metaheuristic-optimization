@@ -1,16 +1,19 @@
 #include <algorithm>
 #include <cmath>
+#include <vector>
 
 #include "ihcp_model.h"
 #include "ihcp_parameters.h"
+#include "random.h"
 
 
-ihcp_model::ihcp_model()
+ihcp_model::ihcp_model(float noise_level) :
+    noise_level(noise_level)
 {
-    exact_temperatures.resize(num_thermocouples * num_measurements, 0.0f);
-    ihcp_parameters true_params{};
-    true_params.q = 400000.0f;
-    true_params.alpha = 4000.0f;
+    exact_temperatures.resize(num_thermocouples * num_measurements);
+    measured_temperatures.resize(num_thermocouples * num_measurements);
+
+    ihcp_parameters true_params{ .q = 400000.0f, .alpha = 4000.0f };
     generate_reference_data(true_params);
 }
 
@@ -238,15 +241,24 @@ void ihcp_model::run_simulation(
 
 void ihcp_model::generate_reference_data(const ihcp_parameters& true_params)
 {
-    std::vector<std::vector<float>> temp_reconstructed(
-        num_thermocouples,
-        std::vector<float>(num_measurements)
+    std::vector<std::vector<float>> sim_output(
+        num_thermocouples, std::vector<float>(num_measurements)
     );
-    run_simulation(true_params, temp_reconstructed);
+    run_simulation(true_params, sim_output);
 
     for (int i = 0; i < num_thermocouples; ++i)
+    {
         for (int j = 0; j < num_measurements; ++j)
-            exact_temperatures[i * num_measurements + j] = temp_reconstructed[i][j];
+        {
+            std::size_t idx = i * num_measurements + j;
+            float t_exact = sim_output[i][j];
+
+            exact_temperatures[idx] = t_exact;
+            measured_temperatures[idx] = (noise_level > 0.0f) ?
+                t_exact * rng::normal(1.0f, noise_level / 3.0f) :
+                t_exact;
+        }
+    }
 }
 
 
@@ -266,7 +278,7 @@ ihcp_result ihcp_model::objective_function(const ihcp_parameters& parameters_q) 
     {
         for (int j = 0; j < num_measurements; ++j)
         {
-            float diff = reconstructed[i][j] - exact_temperatures[i * num_measurements + j];
+            float diff = reconstructed[i][j] - measured_temperatures[i * num_measurements + j];
             sq_error += diff * diff;
 
             float abs_diff = std::abs(diff);

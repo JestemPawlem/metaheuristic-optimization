@@ -24,7 +24,7 @@ def main():
 
     parser.add_argument('--session-dir', type=str)
     parser.add_argument('--run-id', type=str)
-    parser.add_argument('--optimizer', type=str, default='pso', choices=['pso', 'sga', 'cs'])
+    parser.add_argument('--optimizer', type=str, default='pso', choices=['aco', 'cs', 'pso', 'sga'])
     parser.add_argument('--n-runs', type=int, default=1)
 
     parser.add_argument('--n-pop', type=int, default=30)
@@ -38,6 +38,9 @@ def main():
     parser.add_argument('--sga-mutation-rate', dest='sga_mutation_rate', type=float, default=0.1)
 
     parser.add_argument('--cs-pa', dest='cs_pa', type=float, default=0.25)
+
+    parser.add_argument('--aco-locality', dest='aco_locality', type=float, default=0.3)
+    parser.add_argument('--aco-evaporation', dest='aco_evaporation', type=float, default=0.85)
 
     args = parser.parse_args()
 
@@ -59,12 +62,14 @@ def main():
         str(args.n_iter)
     ]
 
-    if args.optimizer == 'pso':
+    if args.optimizer == 'aco':
+        cmd.extend([str(args.aco_locality), str(args.aco_evaporation)])
+    elif args.optimizer == 'cs':
+        cmd.extend([str(args.cs_pa)])
+    elif args.optimizer == 'pso':
         cmd.extend([str(args.pso_inertia), str(args.pso_c1), str(args.pso_c2)])
     elif args.optimizer == 'sga':
         cmd.extend([str(args.sga_crossover_rate), str(args.sga_mutation_rate)])
-    elif args.optimizer == 'cs':
-        cmd.extend([str(args.cs_pa)])
 
     try:
         start_time = time.perf_counter()

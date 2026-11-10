@@ -47,7 +47,7 @@ def main():
         {'n_pop': 30, 'n_iter': 120},
     ]
     optimizers = [
-        'pso', 'sga', 'cs'
+        'aco', 'cs', 'pso', 'sga'
     ]
 
     tasks = []

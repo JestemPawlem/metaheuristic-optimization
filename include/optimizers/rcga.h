@@ -10,10 +10,10 @@
 #include "optimizer.h"
 
 
-class simple_genetic_algorithm : public optimizer
+class real_coded_genetic_algorithm : public optimizer
 {
 public:
-    simple_genetic_algorithm(
+    real_coded_genetic_algorithm(
         const ihcp_model& model,
         ihcp_bounds bounds,
         std::size_t population_size,

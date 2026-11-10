@@ -32,6 +32,6 @@ private:
     struct nest
     {
         ihcp_parameters position{};
-        ihcp_result phenotype{};
+        ihcp_result result{};
     };
 };

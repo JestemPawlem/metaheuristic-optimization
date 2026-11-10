@@ -1,13 +1,13 @@
 #include <algorithm>
 #include <limits>
 #include <print>
-#include <random>
 #include <vector>
 
 #include "ihcp_model.h"
-#include "optimizers/sga.h"
+#include "optimizers/rcga.h"
+#include "random.h"
 
-simple_genetic_algorithm::simple_genetic_algorithm(
+real_coded_genetic_algorithm::real_coded_genetic_algorithm(
     const ihcp_model& model,
     ihcp_bounds bounds,
     std::size_t population_size,
@@ -22,7 +22,7 @@ simple_genetic_algorithm::simple_genetic_algorithm(
     mutation_rate(mutation_rate)
 {}
 
-optimization_result simple_genetic_algorithm::optimize()
+optimization_result real_coded_genetic_algorithm::optimize()
 {
     std::size_t n_evaluations{};
     auto evaluate = [&](const ihcp_parameters& params)
@@ -31,69 +31,50 @@ optimization_result simple_genetic_algorithm::optimize()
             return model.objective_function(params);
         };
 
-    std::random_device rd;
-    std::mt19937 gen(rd());
-
-    std::array<std::uniform_real_distribution<float>, 2> dist_genes;
-    std::array<float, 2> gene_range{};
+    std::array<float, 2> ranges{};
 
     for (std::size_t d{}; d < 2; ++d)
-    {
-        gene_range[d] = bounds.upper[d] - bounds.lower[d];
-        dist_genes[d] = std::uniform_real_distribution<float>(bounds.lower[d], bounds.upper[d]);
-    }
-
-    std::uniform_real_distribution<float> dist_01(0.0f, 1.0f);
-    std::uniform_int_distribution<std::size_t> dist_idx(0, population_size - 1);
+        ranges[d] = bounds.upper[d] - bounds.lower[d];
 
     std::vector<individual> population(population_size);
-    individual best_individual;
+    individual best;
 
     for (std::size_t i{}; i < population_size; ++i)
     {
         for (std::size_t d{}; d < 2; ++d)
-            population[i].genotype[d] = dist_genes[d](gen);
+            population[i].genotype[d] = rng::uniform(bounds.lower[d], bounds.upper[d]);
 
         population[i].phenotype = evaluate(population[i].genotype);
 
-        if (i == 0 || population[i].phenotype < best_individual.phenotype)
-            best_individual = population[i];
+        if (i == 0 || population[i].phenotype < best.phenotype)
+            best = population[i];
     }
 
     std::vector<individual> next_population(population_size);
 
-    std::size_t stagnation_counter{};
-    constexpr std::size_t max_stagnation{ 5 };
-    float last_best_fitness = best_individual.phenotype.fitness;
-
     for (std::size_t iter{}; iter < n_iterations; ++iter)
     {
-        float current_mutation_rate = mutation_rate;
-
-        if (stagnation_counter >= max_stagnation)
-            current_mutation_rate = mutation_rate * 2.0f;
-
-        individual prev_best = best_individual;
+        individual prev_best = best;
 
         for (std::size_t i{ 0 }; i < population_size; i += 2)
         {
-            std::size_t p1 = dist_idx(gen);
-            std::size_t p2 = dist_idx(gen);
+            std::size_t p1 = rng::index(population_size);
+            std::size_t p2 = rng::index(population_size);
             const individual& parent1 = (population[p1].phenotype < population[p2].phenotype) ?
                 population[p1] : population[p2];
 
-            std::size_t p3 = dist_idx(gen);
-            std::size_t p4 = dist_idx(gen);
+            std::size_t p3 = rng::index(population_size);
+            std::size_t p4 = rng::index(population_size);
             const individual& parent2 = (population[p3].phenotype < population[p4].phenotype) ?
                 population[p3] : population[p4];
 
             individual offspring1, offspring2;
 
-            if (dist_01(gen) < crossover_rate)
+            if (rng::bernoulli(crossover_rate))
             {
                 for (std::size_t d{}; d < 2; ++d)
                 {
-                    float gamma = dist_01(gen);
+                    float gamma = rng::uniform();
                     offspring1.genotype[d] = gamma * parent1.genotype[d] + (1.0f - gamma) * parent2.genotype[d];
                     offspring2.genotype[d] = (1.0f - gamma) * parent1.genotype[d] + gamma * parent2.genotype[d];
                 }
@@ -106,33 +87,31 @@ optimization_result simple_genetic_algorithm::optimize()
 
             for (std::size_t d{}; d < 2; ++d)
             {
-                float sigma = gene_range[d] * 0.05f;
+                float sigma = ranges[d] * 0.05f;
 
-                if (dist_01(gen) < current_mutation_rate)
+                if (rng::bernoulli(mutation_rate))
                 {
-                    std::normal_distribution<float> mut_dist(0.0f, sigma);
-                    offspring1.genotype[d] += mut_dist(gen);
+                    offspring1.genotype[d] += rng::normal(0.0f, sigma);
                     offspring1.genotype[d] = std::clamp(offspring1.genotype[d], bounds.lower[d], bounds.upper[d]);
                 }
-                if (dist_01(gen) < current_mutation_rate)
+                if (rng::bernoulli(mutation_rate))
                 {
-                    std::normal_distribution<float> mut_dist(0.0f, sigma);
-                    offspring2.genotype[d] += mut_dist(gen);
+                    offspring2.genotype[d] += rng::normal(0.0f, sigma);
                     offspring2.genotype[d] = std::clamp(offspring2.genotype[d], bounds.lower[d], bounds.upper[d]);
                 }
             }
 
             offspring1.phenotype = evaluate(offspring1.genotype);
             next_population[i] = offspring1;
-            if (offspring1.phenotype < best_individual.phenotype)
-                best_individual = offspring1;
+            if (offspring1.phenotype < best.phenotype)
+                best = offspring1;
 
             if (i + 1 < population_size)
             {
                 offspring2.phenotype = evaluate(offspring2.genotype);
                 next_population[i + 1] = offspring2;
-                if (offspring2.phenotype < best_individual.phenotype)
-                    best_individual = offspring2;
+                if (offspring2.phenotype < best.phenotype)
+                    best = offspring2;
             }
         }
 
@@ -142,27 +121,17 @@ optimization_result simple_genetic_algorithm::optimize()
             });
         *worst_it = prev_best;
 
-        if (last_best_fitness == best_individual.phenotype.fitness)
-        {
-            stagnation_counter = 0;
-            last_best_fitness = best_individual.phenotype.fitness;
-        }
-        else
-        {
-            ++stagnation_counter;
-        }
-
         population = next_population;
 
         std::println("Iteration: {:3}/{}  |  Best Fitness: {:10.4f}  |  Mean Error: {:10.6f} K",
             iter + 1, n_iterations,
-            best_individual.phenotype.fitness,
-            best_individual.phenotype.mean_error);
+            best.phenotype.fitness,
+            best.phenotype.mean_error);
     }
 
     optimization_result final_res;
-    final_res.best_parameters = best_individual.genotype;
-    final_res.best_result = best_individual.phenotype;
+    final_res.best_parameters = best.genotype;
+    final_res.best_result = best.phenotype;
     final_res.n_evaluations = n_evaluations;
     return final_res;
 }

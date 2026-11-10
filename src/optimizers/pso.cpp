@@ -1,11 +1,11 @@
 #include <algorithm>
 #include <limits>
 #include <print>
-#include <random>
 #include <vector>
 
 #include "ihcp_model.h"
 #include "optimizers/pso.h"
+#include "random.h"
 
 
 particle_swarm_optimization::particle_swarm_optimization(
@@ -35,21 +35,15 @@ optimization_result particle_swarm_optimization::optimize()
             return model.objective_function(params);
         };
 
-    std::random_device rd;
-    std::mt19937 gen(rd());
-
-    std::array<std::uniform_real_distribution<float>, 2> dist_pos;
-    std::array<std::uniform_real_distribution<float>, 2> dist_vel;
+    ihcp_parameters ranges{};
     ihcp_parameters vmax{};
 
     for (std::size_t d{}; d < 2; ++d)
     {
         float range = bounds.upper[d] - bounds.lower[d];
-        dist_pos[d] = std::uniform_real_distribution<float>(bounds.lower[d], bounds.upper[d]);
-        dist_vel[d] = std::uniform_real_distribution<float>(-range * 0.05f, range * 0.05f);
+        ranges[d] = range;
         vmax[d] = range * 0.1f;
     }
-    std::uniform_real_distribution<float> dist_01(0.0f, 1.0f);
 
     std::vector<particle> population(population_size);
     ihcp_parameters best_position{};
@@ -59,12 +53,13 @@ optimization_result particle_swarm_optimization::optimize()
     {
         for (std::size_t d{}; d < 2; ++d)
         {
-            population[i].position[d] = dist_pos[d](gen);
-            population[i].velocity[d] = dist_vel[d](gen);
+            population[i].position[d] = rng::uniform(bounds.lower[d], bounds.upper[d]);
+            population[i].velocity[d] = rng::uniform(-ranges[d] * 0.05f, ranges[d] * 0.05f);
             population[i].best_position[d] = population[i].position[d];
         }
 
         ihcp_result result = evaluate(population[i].position);
+        population[i].best_result = result;
 
         if (result < best_result)
         {
@@ -79,8 +74,8 @@ optimization_result particle_swarm_optimization::optimize()
         {
             for (std::size_t d{}; d < 2; ++d)
             {
-                float r1 = dist_01(gen);
-                float r2 = dist_01(gen);
+                float r1 = rng::uniform();
+                float r2 = rng::uniform();
 
                 population[p].velocity[d] = inertia * population[p].velocity[d] +
                     c1 * r1 * (population[p].best_position[d] - population[p].position[d]) +
@@ -116,10 +111,12 @@ optimization_result particle_swarm_optimization::optimize()
             }
         }
 
-        std::println("Iteration: {:3}/{}  |  Best Fitness: {:10.4f}  |  Mean Error: {:10.6f} K",
+        std::println("Iteration: {:3}/{}  |  Best Fitness: {:10.4f}  |  Mean Error: {:10.6f} K | q: {:.4f} | alpha: {:.4f}",
             iter + 1, n_iterations,
             best_result.fitness,
-            best_result.mean_error);
+            best_result.mean_error,
+            best_position.q,
+            best_position.alpha);
     }
 
     optimization_result final_res;

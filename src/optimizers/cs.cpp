@@ -3,11 +3,11 @@
 #include <limits>
 #include <numbers>
 #include <print>
-#include <random>
 #include <vector>
 
 #include "ihcp_model.h"
 #include "optimizers/cs.h"
+#include "random.h"
 
 
 cuckoo_search::cuckoo_search(
@@ -32,16 +32,6 @@ optimization_result cuckoo_search::optimize()
             return model.objective_function(params);
         };
 
-    std::random_device rd;
-    std::mt19937 gen(rd());
-
-    std::array<std::uniform_real_distribution<float>, 2> dist_pos;
-    for (std::size_t d{}; d < 2; ++d)
-        dist_pos[d] = std::uniform_real_distribution<float>(bounds.lower[d], bounds.upper[d]);
-
-    std::uniform_real_distribution<float> dist_01(0.0f, 1.0f);
-    std::uniform_int_distribution<std::size_t> dist_idx(0, population_size - 1);
-
     constexpr float beta = 1.5f;
     const float sigma_u = std::pow(
         (std::tgamma(1.0f + beta) * std::sin(std::numbers::pi_v<float> * beta / 2.0f)) /
@@ -49,36 +39,36 @@ optimization_result cuckoo_search::optimize()
         1.0f / beta
     );
 
-    std::normal_distribution<float> dist_u(0.0f, sigma_u);
-    std::normal_distribution<float> dist_v(0.0f, 1.0f);
-
     std::vector<nest> population(population_size);
-    nest best_nest;
+    nest best;
 
     for (std::size_t i{}; i < population_size; ++i)
     {
         for (std::size_t d{}; d < 2; ++d)
-            population[i].position[d] = dist_pos[d](gen);
+            population[i].position[d] = rng::uniform(bounds.lower[d], bounds.upper[d]);
 
-        population[i].phenotype = evaluate(population[i].position);
+        population[i].result = evaluate(population[i].position);
 
-        if (population[i].phenotype < best_nest.phenotype)
-            best_nest = population[i];
+        if (population[i].result < best.result)
+            best = population[i];
     }
 
     for (std::size_t iter{}; iter < n_iterations; ++iter)
     {
         for (std::size_t i{}; i < population_size; ++i)
         {
+            if (population[i].position == best.position)
+                continue;
+
             ihcp_parameters new_pos{};
 
             for (std::size_t d{}; d < 2; ++d)
             {
-                float u = dist_u(gen);
-                float v = dist_v(gen);
-                float levy_step = u / std::pow(std::abs(v), 1.0f / beta);
+                float u = rng::normal(0.0f, sigma_u);
+                float abs_v = std::max(std::abs(rng::normal()), std::numeric_limits<float>::min());
+                float levy_step = u / std::pow(abs_v, 1.0f / beta);
 
-                float step_size = 0.3f * levy_step * (population[i].position[d] - best_nest.position[d]);
+                float step_size = 0.3f * levy_step * (population[i].position[d] - best.position[d]);
 
                 new_pos[d] = population[i].position[d] + step_size;
                 new_pos[d] = std::clamp(new_pos[d], bounds.lower[d], bounds.upper[d]);
@@ -86,56 +76,55 @@ optimization_result cuckoo_search::optimize()
 
             ihcp_result result = evaluate(new_pos);
 
-            if (result < population[i].phenotype)
+            if (result < population[i].result)
             {
                 population[i].position = new_pos;
-                population[i].phenotype = result;
+                population[i].result = result;
 
-                if (result < best_nest.phenotype)
-                    best_nest = population[i];
+                if (result < best.result)
+                    best = population[i];
             }
         }
 
-        // Krok 2: Odkrywanie obcych jaj (samoadaptująca mutacja różnicowa DE/rand/1)
         for (std::size_t i{}; i < population_size; ++i)
         {
-            if (dist_01(gen) < pa)
+            if (rng::bernoulli(pa))
             {
-                std::size_t j = dist_idx(gen);
-                std::size_t k = dist_idx(gen);
+                std::size_t j = rng::index(population_size);
+                std::size_t k = rng::index(population_size);
 
-                while (j == i) j = dist_idx(gen);
-                while (k == i || k == j) k = dist_idx(gen);
+                while (j == i) j = rng::index(population_size);
+                while (k == i || k == j) k = rng::index(population_size);
 
                 ihcp_parameters new_pos{};
                 for (std::size_t d{}; d < 2; ++d)
                 {
-                    new_pos[d] = population[i].position[d] + dist_01(gen) * (population[j].position[d] - population[k].position[d]);
+                    new_pos[d] = population[i].position[d] + rng::uniform() * (population[j].position[d] - population[k].position[d]);
                     new_pos[d] = std::clamp(new_pos[d], bounds.lower[d], bounds.upper[d]);
                 }
 
                 ihcp_result result = evaluate(new_pos);
 
-                if (result < population[i].phenotype)
+                if (result < population[i].result)
                 {
                     population[i].position = new_pos;
-                    population[i].phenotype = result;
+                    population[i].result = result;
 
-                    if (result < best_nest.phenotype)
-                        best_nest = population[i];
+                    if (result < best.result)
+                        best = population[i];
                 }
             }
         }
 
         std::println("Iteration: {:3}/{}  |  Best Fitness: {:10.4f}  |  Mean Error: {:10.6f} K",
             iter + 1, n_iterations,
-            best_nest.phenotype.fitness,
-            best_nest.phenotype.mean_error);
+            best.result.fitness,
+            best.result.mean_error);
     }
 
     optimization_result final_res;
-    final_res.best_parameters = best_nest.position;
-    final_res.best_result = best_nest.phenotype;
+    final_res.best_parameters = best.position;
+    final_res.best_result = best.result;
     final_res.n_evaluations = n_evaluations;
     return final_res;
 }

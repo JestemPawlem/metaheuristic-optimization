@@ -11,10 +11,10 @@
 class ihcp_model
 {
 public:
-    static constexpr int quantity = 501;
-    static constexpr int num_thermocouples = 2;
-    static constexpr int num_measurements = 100;
-    static constexpr int measurement_step = 10;
+    static constexpr std::size_t quantity = 501;
+    static constexpr std::size_t num_thermocouples = 2;
+    static constexpr std::size_t num_measurements = 100;
+    static constexpr std::size_t measurement_step = 10;
 
     float lambda1 = 104.0f;
     float lambda2 = 240.0f;
@@ -35,11 +35,11 @@ public:
     int node_indices[num_thermocouples] = { 451, 401 };
     float start_times[num_thermocouples] = { 105.0f, 117.0f };
 
-    std::vector<float> exact_temperatures;
+    ihcp_model(float noise_level = 0.0f);
 
-    ihcp_model();
-
-    ihcp_result objective_function(const ihcp_parameters& parameters_q) const;
+    ihcp_result objective_function(const ihcp_parameters& params) const;
+    const std::vector<float>& get_exact_temperatures() const noexcept;
+    const std::vector<float>& get_measured_temperatures() const noexcept;
 
 private:
     void thomas_algorithm(
@@ -61,4 +61,9 @@ private:
         std::vector<std::vector<float>>& out_reconstructed) const;
 
     void generate_reference_data(const ihcp_parameters& true_params);
+
+    float noise_level;
+
+    std::vector<float> exact_temperatures;
+    std::vector<float> measured_temperatures;
 };
