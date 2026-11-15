@@ -6,7 +6,6 @@ import subprocess
 import sys
 import time
 
-import pandas as pd
 from tqdm import tqdm
 
 sys.path.append(str(Path(__file__).resolve().parent))
@@ -31,7 +30,8 @@ def main():
         description='Parallel IHCP optimization runner with progress tracking'
     )
     parser.add_argument('--workers', type=int, default=None, help='Worker processes count (default: all CPU cores)')
-    parser.add_argument('--n-runs', type=int, default=10, help='Repetitions per configuration (default: 10)')
+    parser.add_argument('--n-runs', type=int, default=5, help='Repetitions per configuration (default: 10)')
+    parser.add_argument('--noise-level', type=float, default=0.00, help='IHCP sensor noise level (default: 0.03)')
     args = parser.parse_args()
 
     runner_script = ROOT_DIR / 'scripts' / 'run_single.py'
@@ -40,14 +40,13 @@ def main():
     session_dir = (ROOT_DIR / 'results' / f'session_{timestamp}').resolve()
 
     configurations = [
-        {'n_pop': 10, 'n_iter': 40},
-        {'n_pop': 15, 'n_iter': 60},
-        {'n_pop': 20, 'n_iter': 80},
-        {'n_pop': 25, 'n_iter': 100},
-        {'n_pop': 30, 'n_iter': 120},
+        {'n_solutions': 10, 'n_iter': 40},
+        {'n_solutions': 15, 'n_iter': 60},
+        {'n_solutions': 20, 'n_iter': 80},
+        {'n_solutions': 25, 'n_iter': 100},
     ]
     optimizers = [
-        'aco', 'cs', 'pso', 'sga'
+        'aco', 'cs', 'pso', 'rcga'
     ]
 
     tasks = []
@@ -59,9 +58,10 @@ def main():
                 str(runner_script),
                 '--session-dir', str(session_dir),
                 '--run-id', f'{task_idx:02d}',
+                '--noise-level', str(args.noise_level),
                 '--optimizer', optimizer,
                 '--n-runs', str(args.n_runs),
-                '--n-pop', str(configuration['n_pop']),
+                '--n-solutions', str(configuration['n_solutions']),
                 '--n-iter', str(configuration['n_iter'])
             ]
 
@@ -71,7 +71,7 @@ def main():
     print_info(f'Session directory: {session_dir.name}')
     print_info(f'Queued {len(tasks)} tasks...\n')
 
-    start_time = time.perf_counter();
+    start_time = time.perf_counter()
     with ProcessPoolExecutor(max_workers=args.workers) as executor:
         futures = [executor.submit(run_experiment_task, t) for t in tasks]
 
@@ -82,6 +82,7 @@ def main():
             for future in as_completed(futures):
                 future.result()
                 pbar.update()
+
     elapsed = time.perf_counter() - start_time
     minutes, seconds = divmod(int(elapsed), 60)
     print_info(f'Experiments took {minutes:d}m {seconds:d}s')

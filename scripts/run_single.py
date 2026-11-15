@@ -24,18 +24,20 @@ def main():
 
     parser.add_argument('--session-dir', type=str)
     parser.add_argument('--run-id', type=str)
-    parser.add_argument('--optimizer', type=str, default='pso', choices=['aco', 'cs', 'pso', 'sga'])
+    parser.add_argument('--noise-level', dest='noise_level', type=float, default=0.03)
+    parser.add_argument('--optimizer', type=str, default='pso', choices=['aco', 'cs', 'gwo', 'pso', 'rcga'])
     parser.add_argument('--n-runs', type=int, default=1)
 
-    parser.add_argument('--n-pop', type=int, default=30)
-    parser.add_argument('--n-iter', type=int, default=30)
+    # Obsługa nowej i starej nazwy dla spójności
+    parser.add_argument('--n-solutions', '--n-pop', dest='n_solutions', type=int, default=30)
+    parser.add_argument('--n-iter', dest='n_iter', type=int, default=30)
 
     parser.add_argument('--pso-inertia', dest='pso_inertia', type=float, default=0.7)
     parser.add_argument('--pso-c1', dest='pso_c1', type=float, default=1.5)
     parser.add_argument('--pso-c2', dest='pso_c2', type=float, default=1.5)
 
-    parser.add_argument('--sga-crossover-rate', dest='sga_crossover_rate', type=float, default=0.8)
-    parser.add_argument('--sga-mutation-rate', dest='sga_mutation_rate', type=float, default=0.1)
+    parser.add_argument('--rcga-crossover-rate', dest='rcga_crossover_rate', type=float, default=0.8)
+    parser.add_argument('--rcga-mutation-rate', dest='rcga_mutation_rate', type=float, default=0.1)
 
     parser.add_argument('--cs-pa', dest='cs_pa', type=float, default=0.25)
 
@@ -52,13 +54,21 @@ def main():
     run_id = args.run_id if args.run_id else generate_run_id()
     log_file_path = session_dir / f'run_{run_id}.log'
 
+    # Zgodnie z C++ main():
+    # argv[1] = session_dir
+    # argv[2] = run_id
+    # argv[3] = noise_level
+    # argv[4] = algorithm
+    # argv[5] = n_runs
+    # argv[6+] = optimizer_args (n_solutions, n_iter, ...)
     cmd = [
         str(EXE_PATH),
         str(session_dir),
         str(run_id),
+        str(args.noise_level),
         str(args.optimizer),
         str(args.n_runs),
-        str(args.n_pop),
+        str(args.n_solutions),
         str(args.n_iter)
     ]
 
@@ -68,8 +78,10 @@ def main():
         cmd.extend([str(args.cs_pa)])
     elif args.optimizer == 'pso':
         cmd.extend([str(args.pso_inertia), str(args.pso_c1), str(args.pso_c2)])
-    elif args.optimizer == 'sga':
-        cmd.extend([str(args.sga_crossover_rate), str(args.sga_mutation_rate)])
+    elif args.optimizer == 'rcga':
+        cmd.extend([str(args.rcga_crossover_rate), str(args.rcga_mutation_rate)])
+    elif args.optimizer == 'gwo':
+        pass  # GWO przyjmuje tylko n_solutions i n_iter
 
     try:
         start_time = time.perf_counter()

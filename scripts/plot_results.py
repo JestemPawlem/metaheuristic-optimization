@@ -43,12 +43,12 @@ def setup_plot_style():
 
 
 def generate_plots(df: pd.DataFrame, output_dir: Path):
-    required_cols = {'algorithm', 'fitness', 'mean_error', 'n_evaluations', 'n_pop', 'n_iter'}
+    required_cols = {'algorithm', 'fitness', 'mae', 'n_evaluations', 'n_solutions', 'n_iterations'}
     if not required_cols.issubset(df.columns):
         raise ValueError(f'DataFrame missing required columns: {required_cols - set(df.columns)}')
 
     df['n_evaluations'] = (
-        df.groupby(['algorithm', 'n_pop', 'n_iter'])['n_evaluations']
+        df.groupby(['algorithm', 'n_solutions', 'n_iterations'])['n_evaluations']
         .transform('mean')
         .round()
         .astype(int)
@@ -57,7 +57,7 @@ def generate_plots(df: pd.DataFrame, output_dir: Path):
     q80 = df.groupby(['algorithm', 'n_evaluations'])['fitness'].transform(lambda s: s.quantile(0.80))
     df = df[df['fitness'] <= q80].copy()
 
-    df[['fitness', 'mean_error']] = df[['fitness', 'mean_error']].clip(lower=1e-6)
+    df[['fitness', 'mae']] = df[['fitness', 'mae']].clip(lower=1e-6)
 
     output_dir.mkdir(parents=True, exist_ok=True)
     setup_plot_style()
@@ -85,7 +85,7 @@ def generate_plots(df: pd.DataFrame, output_dir: Path):
     sns.lineplot(
         data=df,
         x='n_evaluations',
-        y='mean_error',
+        y='mae',
         hue='algorithm',
         marker='s',
         ax=ax,

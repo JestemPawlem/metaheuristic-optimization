@@ -6,14 +6,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(ihcp_optimizer
     src/main.cpp 
-    src/optimizers/pso.cpp
-    src/ihcp_model.cpp
-    src/run_experiment.cpp
-    "src/optimizers/rcga.cpp"
-    src/csv_logger.cpp
-    src/optimizers/cs.cpp
-    src/optimizers/optimizer_factory.cpp
-    src/optimizers/aco.cpp "include/optimizers/gwo.h" "src/optimizers/gwo.cpp" "include/random.h" "src/random.cpp")
+    
+    
+    
+    
+    
+    
+    
+     "include/optimizers/gwo.h"  "include/random.h"  "include/optimization_types.h"  "include/optimization_problem.h" "include/evaluation_counter.h")
 
 target_include_directories(ihcp_optimizer PRIVATE include)
 
