@@ -3,21 +3,21 @@
 #include <cstddef>
 #include <functional>
 #include <memory>
-#include <span>
 #include <stdexcept>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
 
-#include "optimization_problem.h"
+#include "config.h"
 #include "optimizers/aco.h"
+#include "optimizers/aoa.h"
 #include "optimizers/cs.h"
 #include "optimizers/gwo.h"
 #include "optimizers/optimizer.h"
 #include "optimizers/pso.h"
 #include "optimizers/rcga.h"
-
+#include "problems/optimization_problem.h"
 
 template <std::size_t Dim>
 class optimizer_factory
@@ -35,14 +35,15 @@ public:
     static result create(
         std::string_view algorithm,
         const optimization_problem<Dim>& problem,
-        std::span<char*> optimizer_args)
+        const config& cfg)
     {
+        const std::size_t n_solutions = cfg.get<std::size_t>("n_solutions", 20);
+        const std::size_t n_iterations = cfg.get<std::size_t>("n_iterations", 80);
+
         if (algorithm == "aco")
         {
-            std::size_t n_solutions = optimizer_args.size() > 0 ? std::stoul(optimizer_args[0]) : 20;
-            std::size_t n_iterations = optimizer_args.size() > 1 ? std::stoul(optimizer_args[1]) : 80;
-            float locality = optimizer_args.size() > 2 ? std::stof(optimizer_args[2]) : 0.3f;
-            float evaporation = optimizer_args.size() > 3 ? std::stof(optimizer_args[3]) : 0.85f;
+            const float locality = cfg.get<float>("aco.locality", 0.3f);
+            const float evaporation = cfg.get<float>("aco.evaporation", 0.85f);
 
             hyperparam_list params = {
                 {"n_solutions", std::to_string(n_solutions)},
@@ -60,21 +61,48 @@ public:
             return { std::move(factory), std::move(params) };
         }
 
+        if (algorithm == "aoa")
+        {
+            using aoa = archimedes_optimization_algorithm<Dim>;
+            typename aoa::parameters p{
+                .n_solutions = n_solutions,
+                .n_iterations = n_iterations,
+                .c1 = cfg.get<float>("aoa.c1", 2.0f),
+                .c2 = cfg.get<float>("aoa.c2", 6.0f),
+                .c3 = cfg.get<float>("aoa.c3", 2.0f),
+                .c4 = cfg.get<float>("aoa.c4", 0.5f)
+            };
+
+            hyperparam_list params = {
+                {"n_solutions", std::to_string(p.n_solutions)},
+                {"n_iterations", std::to_string(p.n_iterations)},
+                {"aoa_c1", std::to_string(p.c1)},
+                {"aoa_c2", std::to_string(p.c2)},
+                {"aoa_c3", std::to_string(p.c3)},
+                {"aoa_c4", std::to_string(p.c4)}
+            };
+
+            auto factory = [&problem, p]() {
+                return std::make_unique<aoa>(problem, p);
+                };
+
+            return { std::move(factory), std::move(params) };
+        }
+
         if (algorithm == "cs")
         {
-            std::size_t n_solutions = optimizer_args.size() > 0 ? std::stoul(optimizer_args[0]) : 20;
-            std::size_t n_iterations = optimizer_args.size() > 1 ? std::stoul(optimizer_args[1]) : 60;
-            float pa = optimizer_args.size() > 2 ? std::stof(optimizer_args[2]) : 0.25f;
+            const std::size_t cs_iterations = cfg.get<std::size_t>("n_iterations", 60);
+            const float pa = cfg.get<float>("cs.pa", 0.25f);
 
             hyperparam_list params = {
                 {"n_solutions", std::to_string(n_solutions)},
-                {"n_iterations", std::to_string(n_iterations)},
+                {"n_iterations", std::to_string(cs_iterations)},
                 {"cs_pa", std::to_string(pa)}
             };
 
-            auto factory = [&problem, n_solutions, n_iterations, pa]() {
+            auto factory = [&problem, n_solutions, cs_iterations, pa]() {
                 return std::make_unique<cuckoo_search<Dim>>(
-                    problem, n_solutions, n_iterations, pa
+                    problem, n_solutions, cs_iterations, pa
                 );
                 };
 
@@ -83,11 +111,9 @@ public:
 
         if (algorithm == "pso")
         {
-            std::size_t n_solutions = optimizer_args.size() > 0 ? std::stoul(optimizer_args[0]) : 20;
-            std::size_t n_iterations = optimizer_args.size() > 1 ? std::stoul(optimizer_args[1]) : 80;
-            float inertia = optimizer_args.size() > 2 ? std::stof(optimizer_args[2]) : 0.7f;
-            float c1 = optimizer_args.size() > 3 ? std::stof(optimizer_args[3]) : 1.5f;
-            float c2 = optimizer_args.size() > 4 ? std::stof(optimizer_args[4]) : 1.5f;
+            const float inertia = cfg.get<float>("pso.inertia", 0.7f);
+            const float c1 = cfg.get<float>("pso.c1", 1.5f);
+            const float c2 = cfg.get<float>("pso.c2", 1.5f);
 
             hyperparam_list params = {
                 {"n_solutions", std::to_string(n_solutions)},
@@ -108,10 +134,8 @@ public:
 
         if (algorithm == "rcga")
         {
-            std::size_t n_solutions = optimizer_args.size() > 0 ? std::stoul(optimizer_args[0]) : 20;
-            std::size_t n_iterations = optimizer_args.size() > 1 ? std::stoul(optimizer_args[1]) : 80;
-            float crossover_rate = optimizer_args.size() > 2 ? std::stof(optimizer_args[2]) : 0.8f;
-            float mutation_rate = optimizer_args.size() > 3 ? std::stof(optimizer_args[3]) : 0.3f;
+            const float crossover_rate = cfg.get<float>("rcga.crossover_rate", 0.8f);
+            const float mutation_rate = cfg.get<float>("rcga.mutation_rate", 0.3f);
 
             hyperparam_list params = {
                 {"n_solutions", std::to_string(n_solutions)},
@@ -131,9 +155,6 @@ public:
 
         if (algorithm == "gwo")
         {
-            std::size_t n_solutions = optimizer_args.size() > 0 ? std::stoul(optimizer_args[0]) : 20;
-            std::size_t n_iterations = optimizer_args.size() > 1 ? std::stoul(optimizer_args[1]) : 80;
-
             hyperparam_list params = {
                 {"n_solutions", std::to_string(n_solutions)},
                 {"n_iterations", std::to_string(n_iterations)}

@@ -15,12 +15,8 @@ class optimization_problem
 public:
     virtual ~optimization_problem() = default;
 
-    static constexpr std::size_t dimension() noexcept
-    {
-        return Dim;
-    }
     virtual const optimization_bounds<Dim>& bounds() const noexcept = 0;
-    virtual const std::array<std::string_view, Dim>& parameter_names() const noexcept = 0;
+    virtual const std::array<std::string, Dim>& parameter_names() const noexcept = 0;
 
     virtual float evaluate(const std::array<float, Dim>& parameters) const = 0;
 

@@ -8,7 +8,7 @@
 #include <utility>
 #include <vector>
 
-#include "optimization_problem.h"
+#include "problems/optimization_problem.h"
 #include "optimization_types.h"
 
 

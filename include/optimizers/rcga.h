@@ -7,9 +7,9 @@
 #include <vector>
 
 #include "evaluation_counter.h"
-#include "optimization_problem.h"
 #include "optimization_types.h"
 #include "optimizers/optimizer.h"
+#include "problems/optimization_problem.h"
 #include "random.h"
 
 template <std::size_t Dim>

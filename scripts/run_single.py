@@ -17,20 +17,65 @@ def generate_session_dir() -> Path:
     return ROOT_DIR / 'results' / f'results_{uuid.uuid4().hex[:6]}'
 
 
+def write_config(config_path: Path, session_dir: Path, run_id: str, args: argparse.Namespace) -> None:
+    lines = [
+        f'session_dir = {session_dir}',
+        f'run_id = {run_id}',
+        f'seed = {args.seed}',
+        f'n_runs = {args.n_runs}',
+        '',
+        f'problem = {args.problem}',
+        f'ihcp.noise = {args.noise_level}',
+        '',
+        f'algorithm = {args.optimizer}',
+        f'n_solutions = {args.n_solutions}',
+        f'n_iterations = {args.n_iter}',
+        '',
+        f'aoa.c1 = {args.aoa_c1}',
+        f'aoa.c2 = {args.aoa_c2}',
+        f'aoa.c3 = {args.aoa_c3}',
+        f'aoa.c4 = {args.aoa_c4}',
+        '',
+        f'pso.inertia = {args.pso_inertia}',
+        f'pso.c1 = {args.pso_c1}',
+        f'pso.c2 = {args.pso_c2}',
+        '',
+        f'rcga.crossover_rate = {args.rcga_crossover_rate}',
+        f'rcga.mutation_rate = {args.rcga_mutation_rate}',
+        '',
+        f'cs.pa = {args.cs_pa}',
+        '',
+        f'aco.locality = {args.aco_locality}',
+        f'aco.evaporation = {args.aco_evaporation}',
+    ]
+    config_path.write_text('\n'.join(lines) + '\n', encoding='utf-8')
+
+
 def main():
     parser = argparse.ArgumentParser(
-        description='Runner for single IHCP optimization experiment in C++'
+        description='Runner for single optimization experiment in C++'
     )
 
     parser.add_argument('--session-dir', type=str)
     parser.add_argument('--run-id', type=str)
+    parser.add_argument('--seed', type=int, default=0)
+    parser.add_argument('--problem', type=str, default='ihcp')
     parser.add_argument('--noise-level', dest='noise_level', type=float, default=0.03)
-    parser.add_argument('--optimizer', type=str, default='pso', choices=['aco', 'cs', 'gwo', 'pso', 'rcga'])
+    parser.add_argument(
+        '--optimizer',
+        type=str,
+        default='aoa',
+        choices=['aco', 'aoa', 'cs', 'gwo', 'pso', 'rcga']
+    )
     parser.add_argument('--n-runs', type=int, default=1)
 
-    # Obsługa nowej i starej nazwy dla spójności
     parser.add_argument('--n-solutions', '--n-pop', dest='n_solutions', type=int, default=30)
     parser.add_argument('--n-iter', dest='n_iter', type=int, default=30)
+
+    parser.add_argument('--aoa-c1', dest='aoa_c1', type=float, default=2.0)
+    parser.add_argument('--aoa-c2', dest='aoa_c2', type=float, default=6.0)
+    parser.add_argument('--aoa-c3', dest='aoa_c3', type=float, default=2.0)
+    parser.add_argument('--aoa-c4', dest='aoa_c4', type=float, default=0.5)
 
     parser.add_argument('--pso-inertia', dest='pso_inertia', type=float, default=0.7)
     parser.add_argument('--pso-c1', dest='pso_c1', type=float, default=1.5)
@@ -53,35 +98,11 @@ def main():
 
     run_id = args.run_id if args.run_id else generate_run_id()
     log_file_path = session_dir / f'run_{run_id}.log'
+    config_file_path = session_dir / f'run_{run_id}.cfg'
 
-    # Zgodnie z C++ main():
-    # argv[1] = session_dir
-    # argv[2] = run_id
-    # argv[3] = noise_level
-    # argv[4] = algorithm
-    # argv[5] = n_runs
-    # argv[6+] = optimizer_args (n_solutions, n_iter, ...)
-    cmd = [
-        str(EXE_PATH),
-        str(session_dir),
-        str(run_id),
-        str(args.noise_level),
-        str(args.optimizer),
-        str(args.n_runs),
-        str(args.n_solutions),
-        str(args.n_iter)
-    ]
+    write_config(config_file_path, session_dir, run_id, args)
 
-    if args.optimizer == 'aco':
-        cmd.extend([str(args.aco_locality), str(args.aco_evaporation)])
-    elif args.optimizer == 'cs':
-        cmd.extend([str(args.cs_pa)])
-    elif args.optimizer == 'pso':
-        cmd.extend([str(args.pso_inertia), str(args.pso_c1), str(args.pso_c2)])
-    elif args.optimizer == 'rcga':
-        cmd.extend([str(args.rcga_crossover_rate), str(args.rcga_mutation_rate)])
-    elif args.optimizer == 'gwo':
-        pass  # GWO przyjmuje tylko n_solutions i n_iter
+    cmd = [str(EXE_PATH), str(config_file_path)]
 
     try:
         start_time = time.perf_counter()

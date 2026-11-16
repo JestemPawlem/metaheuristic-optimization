@@ -61,9 +61,9 @@ public:
         return bounds_;
     }
 
-    const std::array<std::string_view, 2>& parameter_names() const noexcept override
+    const std::array<std::string, 2>& parameter_names() const noexcept override
     {
-        static constexpr std::array<std::string_view, 2> names{ "q", "alpha" };
+        static constexpr std::array<std::string, 2> names{ "q", "alpha" };
         return names;
     }
 

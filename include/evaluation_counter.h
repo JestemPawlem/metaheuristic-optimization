@@ -3,7 +3,7 @@
 #include <array>
 #include <cstddef>
 
-#include "optimization_problem.h"
+#include "problems/optimization_problem.h"
 
 
 template <std::size_t Dim>

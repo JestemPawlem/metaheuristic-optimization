@@ -27,11 +27,14 @@ def run_experiment_task(task_args: list[str]) -> None:
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Parallel IHCP optimization runner with progress tracking'
+        description='Parallel optimization runner with progress tracking'
     )
     parser.add_argument('--workers', type=int, default=None, help='Worker processes count (default: all CPU cores)')
-    parser.add_argument('--n-runs', type=int, default=5, help='Repetitions per configuration (default: 10)')
-    parser.add_argument('--noise-level', type=float, default=0.00, help='IHCP sensor noise level (default: 0.03)')
+    parser.add_argument('--n-runs', type=int, default=10, help='Repetitions per configuration (default: 10)')
+    parser.add_argument('--problems', nargs='+', default=['ihcp'], help='Problems to benchmark')
+    parser.add_argument('--optimizers', nargs='+', default=['pso'], help='Optimizers to use')
+    parser.add_argument('--noise-level', type=float, default=0.03, help='IHCP sensor noise level (default: 0.03)')
+    parser.add_argument('--seed', type=int, default=0, help='Base RNG seed (default: 0)')
     args = parser.parse_args()
 
     runner_script = ROOT_DIR / 'scripts' / 'run_single.py'
@@ -44,31 +47,35 @@ def main():
         {'n_solutions': 15, 'n_iter': 60},
         {'n_solutions': 20, 'n_iter': 80},
         {'n_solutions': 25, 'n_iter': 100},
-    ]
-    optimizers = [
-        'aco', 'cs', 'pso', 'rcga'
+        {'n_solutions': 30, 'n_iter': 120},
+        {'n_solutions': 35, 'n_iter': 140},
+        {'n_solutions': 40, 'n_iter': 160},
     ]
 
     tasks = []
     task_idx = 1
 
-    for configuration in configurations:
-        for optimizer in optimizers:
-            task_cmd = [
-                str(runner_script),
-                '--session-dir', str(session_dir),
-                '--run-id', f'{task_idx:02d}',
-                '--noise-level', str(args.noise_level),
-                '--optimizer', optimizer,
-                '--n-runs', str(args.n_runs),
-                '--n-solutions', str(configuration['n_solutions']),
-                '--n-iter', str(configuration['n_iter'])
-            ]
+    for problem in args.problems:
+        for optimizer in args.optimizers:
+            for configuration in configurations:
+                task_cmd = [
+                    str(runner_script),
+                    '--session-dir', str(session_dir),
+                    '--run-id', f'{task_idx:03d}',
+                    '--seed', str(args.seed + task_idx),
+                    '--problem', problem,
+                    '--noise-level', str(args.noise_level),
+                    '--optimizer', optimizer,
+                    '--n-runs', str(args.n_runs),
+                    '--n-solutions', str(configuration['n_solutions']),
+                    '--n-iter', str(configuration['n_iter'])
+                ]
 
-            tasks.append(task_cmd)
-            task_idx += 1
+                tasks.append(task_cmd)
+                task_idx += 1
 
     print_info(f'Session directory: {session_dir.name}')
+    print_info(f'Problems: {", ".join(args.problems)}')
     print_info(f'Queued {len(tasks)} tasks...\n')
 
     start_time = time.perf_counter()
