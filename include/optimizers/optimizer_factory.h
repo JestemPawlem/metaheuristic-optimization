@@ -177,7 +177,8 @@ public:
             {
                 .n_solutions = n_solutions,
                 .n_iterations = n_iterations,
-                .a = cfg.get("sca.a", 2.0f)
+                .a = cfg.get("sca.a", 2.0f),
+                .r3_max = cfg.get("sca.r3_max", 2.0f)
             };
 
             hyperparam_list param_list = {

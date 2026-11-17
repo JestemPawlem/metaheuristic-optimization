@@ -25,6 +25,7 @@ public:
 		std::size_t n_solutions{};
 		std::size_t n_iterations{};
 		float a = 2.0f;
+		float r3_max = 2.0f;
 	};
 
 	sine_cosine_algorithm(
@@ -40,7 +41,7 @@ public:
 
 		evaluation_counter<Dim> evaluate(problem_);
 		const optimization_bounds<Dim>& bounds = problem_.bounds();
-		const auto& [n_solutions, n_iterations, a] = parameters_;
+		const auto& [n_solutions, n_iterations, a, r3_max] = parameters_;
 
 		std::vector<solution> solutions(n_solutions);
 		solution best{};
@@ -67,7 +68,7 @@ public:
 				for (std::size_t d{}; d < Dim; ++d)
 				{
 					const float r2 = rng::uniform(0.0f, two_pi);
-					const float r3 = rng::uniform(0.0f, 2.0f);
+					const float r3 = rng::uniform(0.0f, r3_max);
 
 					const float distance = std::abs(r3 * best.parameters[d] - solutions[s].parameters[d]);
 					const float trig_factor = rng::bernoulli(0.5f) ? std::sin(r2) : std::cos(r2);
