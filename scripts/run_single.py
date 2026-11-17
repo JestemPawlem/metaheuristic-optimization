@@ -53,6 +53,7 @@ def write_config(config_path: Path,
         f'rcga.mutation_rate = {args.rcga_mutation_rate}',
         '',
         f'sca.a = {args.sca_a}',
+        f'sca.r3_max = {args.sca_r3_max}',
     ]
     config_path.write_text('\n'.join(lines) + '\n', encoding='utf-8')
 
@@ -105,6 +106,7 @@ def main():
     )
 
     parser.add_argument('--sca-a', dest='sca_a', type=float, default=2.0)
+    parser.add_argument('--sca-r3-max', dest='sca_r3_max', type=float, default=2.0)
 
     args = parser.parse_args()
 
