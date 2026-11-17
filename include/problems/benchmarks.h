@@ -9,7 +9,6 @@
 #include "optimization_problem.h"
 #include "optimization_types.h"
 
-
 template <std::size_t Dim>
 class benchmark_problem : public optimization_problem<Dim>
 {
@@ -50,7 +49,6 @@ private:
 	std::array<std::string, Dim> parameter_names_{};
 };
 
-
 template <std::size_t Dim>
 class sphere_problem : public benchmark_problem<Dim>
 {
@@ -61,14 +59,17 @@ public:
 
 	float evaluate(const std::array<float, Dim>& x) const override
 	{
+		constexpr float shift = std::numbers::sqrt2_v<float>;
 		float sum{};
 		for (std::size_t d{}; d < Dim; ++d)
-			sum += x[d] * x[d];
+		{
+			const float shifted_x = x[d] - shift;
+			sum += shifted_x * shifted_x;
+		}
 
 		return sum;
 	}
 };
-
 
 template <std::size_t Dim>
 class rastrigin_problem : public benchmark_problem<Dim>
@@ -80,22 +81,24 @@ public:
 
 	float evaluate(const std::array<float, Dim>& x) const override
 	{
+		constexpr float shift = std::numbers::sqrt2_v<float>;
 		constexpr float two_pi = 2.0f * std::numbers::pi_v<float>;
 		float sum = 10.0f * static_cast<float>(Dim);
 
 		for (std::size_t d{}; d < Dim; ++d)
-			sum += x[d] * x[d] - 10.0f * std::cos(two_pi * x[d]);
+		{
+			const float shifted_x = x[d] - shift;
+			sum += shifted_x * shifted_x - 10.0f * std::cos(two_pi * shifted_x);
+		}
 
 		return sum;
 	}
 };
 
-
 template <std::size_t Dim>
 class rosenbrock_problem : public benchmark_problem<Dim>
 {
 	static_assert(Dim >= 2, "Rosenbrock function requires Dim >= 2");
-
 public:
 	rosenbrock_problem(float lower = -5.0f, float upper = 10.0f) :
 		benchmark_problem<Dim>(lower, upper)
@@ -103,17 +106,21 @@ public:
 
 	float evaluate(const std::array<float, Dim>& x) const override
 	{
+		constexpr float shift = std::numbers::sqrt2_v<float> -1.0f;
 		float sum{};
+
 		for (std::size_t d{}; d < Dim - 1; ++d)
 		{
-			const float t1 = x[d + 1] - x[d] * x[d];
-			const float t2 = 1.0f - x[d];
+			const float shifted_xd = x[d] - shift;
+			const float shifted_xd1 = x[d + 1] - shift;
+
+			const float t1 = shifted_xd1 - shifted_xd * shifted_xd;
+			const float t2 = 1.0f - shifted_xd;
 			sum += 100.0f * t1 * t1 + t2 * t2;
 		}
 		return sum;
 	}
 };
-
 
 template <std::size_t Dim>
 class ackley_problem : public benchmark_problem<Dim>
@@ -125,6 +132,7 @@ public:
 
 	float evaluate(const std::array<float, Dim>& x) const override
 	{
+		constexpr float shift = std::numbers::sqrt2_v<float>;
 		constexpr float a = 20.0f;
 		constexpr float b = 0.2f;
 		constexpr float c = 2.0f * std::numbers::pi_v<float>;
@@ -134,8 +142,9 @@ public:
 		float sum_cos{};
 		for (std::size_t d{}; d < Dim; ++d)
 		{
-			sum_sq += x[d] * x[d];
-			sum_cos += std::cos(c * x[d]);
+			const float shifted_x = x[d] - shift;
+			sum_sq += shifted_x * shifted_x;
+			sum_cos += std::cos(c * shifted_x);
 		}
 
 		return -a * std::exp(-b * std::sqrt(sum_sq * inv_dim))
@@ -143,7 +152,6 @@ public:
 			+ a + std::numbers::e_v<float>;
 	}
 };
-
 
 template <std::size_t Dim>
 class bukin6_problem : public benchmark_problem<Dim>
@@ -157,12 +165,17 @@ public:
 
 	float evaluate(const std::array<float, Dim>& x) const override
 	{
-		const float t1 = std::abs(x[1] - 0.01f * x[0] * x[0]);
-		const float t2 = std::abs(x[0] + 10.0f);
+		constexpr float shift_x0 = std::numbers::sqrt2_v<float> +10.0f;
+		constexpr float shift_x1 = std::numbers::sqrt2_v<float> -1.0f;
+
+		const float shifted_x0 = x[0] - shift_x0;
+		const float shifted_x1 = x[1] - shift_x1;
+
+		const float t1 = std::abs(shifted_x1 - 0.01f * shifted_x0 * shifted_x0);
+		const float t2 = std::abs(shifted_x0 + 10.0f);
 		return 100.0f * std::sqrt(t1) + 0.01f * t2;
 	}
 };
-
 
 template <std::size_t Dim>
 class beale_problem : public benchmark_problem<Dim>
@@ -174,13 +187,16 @@ public:
 
 	float evaluate(const std::array<float, Dim>& x) const override
 	{
-		const float x1 = x[0];
-		const float x2 = x[1];
-		const float x2_sq = x2 * x2;
+		constexpr float shift_x0 = std::numbers::sqrt2_v<float> -3.0f;
+		constexpr float shift_x1 = std::numbers::sqrt2_v<float> -0.5f;
 
-		const float t1 = 1.5f - x1 + x1 * x2;
-		const float t2 = 2.25f - x1 + x1 * x2_sq;
-		const float t3 = 2.625f - x1 + x1 * x2_sq * x2;
+		const float shifted_x1 = x[0] - shift_x0;
+		const float shifted_x2 = x[1] - shift_x1;
+		const float x2_sq = shifted_x2 * shifted_x2;
+
+		const float t1 = 1.5f - shifted_x1 + shifted_x1 * shifted_x2;
+		const float t2 = 2.25f - shifted_x1 + shifted_x1 * x2_sq;
+		const float t3 = 2.625f - shifted_x1 + shifted_x1 * x2_sq * shifted_x2;
 
 		return t1 * t1 + t2 * t2 + t3 * t3;
 	}
