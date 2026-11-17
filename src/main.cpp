@@ -18,8 +18,6 @@
 
 int main(int argc, char* argv[])
 {
-    std::system("chcp 65001 > nul");
-
     try
     {
         const std::filesystem::path config_path = (argc > 1) ? argv[1] : "experiment.cfg";
@@ -30,18 +28,16 @@ int main(int argc, char* argv[])
         const std::filesystem::path session_dir = cfg.get_string("session_dir", "results");
         const std::string run_id = cfg.get_string("run_id", "0");
         const std::string problem_name = cfg.get_string("problem", "sphere3");
-        const std::string algorithm = cfg.get_string("algorithm", "aoa");
-        const std::size_t n_runs = cfg.get<std::size_t>("n_runs", 10);
+        const std::string algorithm = cfg.get_string("algorithm", "sca");
+        const std::size_t n_runs = cfg.get("n_runs", 10uz);
+        const bool verbose = cfg.get("verbose", true);
 
-        std::size_t dim = 2;
         std::string_view base_name = problem_name;
+        std::size_t dim = 2;
 
-        if (problem_name != "ihcp")
+        const std::size_t pos = problem_name.find_first_of("0123456789");
+        if (pos != std::string_view::npos)
         {
-            const std::size_t pos = problem_name.find_first_of("0123456789");
-            if (pos == std::string_view::npos)
-                throw std::invalid_argument("Missing dimension in problem name (e.g. sphere3)");
-
             base_name = std::string_view(problem_name).substr(0, pos);
             dim = std::stoul(problem_name.substr(pos));
         }
@@ -52,7 +48,8 @@ int main(int argc, char* argv[])
             auto setup = optimizer_factory<Dim>::create(algorithm, *model, cfg);
 
             std::println("Running {} optimization on {}...", algorithm, problem_name);
-            std::vector<optimization_result<Dim>> results = run_experiment(n_runs, setup.factory);
+            std::vector<optimization_result<Dim>> results =
+                run_experiment(n_runs, setup.factory, verbose);
 
             csv_logger logger(session_dir, run_id);
             logger.log(algorithm, *model, results, setup.hyperparams);

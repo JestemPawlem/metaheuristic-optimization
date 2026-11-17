@@ -36,14 +36,18 @@ public:
 			}
 		}
 
+		if (problem_name == "ackley")
+			return std::make_unique<ackley_problem<Dim>>();
 		if (problem_name == "sphere")
 			return std::make_unique<sphere_problem<Dim>>();
 		if (problem_name == "rastrigin")
 			return std::make_unique<rastrigin_problem<Dim>>();
 		if (problem_name == "rosenbrock")
 			return std::make_unique<rosenbrock_problem<Dim>>();
-		if (problem_name == "ackley")
-			return std::make_unique<ackley_problem<Dim>>();
+		if (problem_name == "bukin")
+			return std::make_unique<bukin6_problem<Dim>>();
+		if (problem_name == "beale")
+			return std::make_unique<beale_problem<Dim>>();
 
 		throw std::invalid_argument(std::string("Unknown problem: ") + std::string(problem_name));
 	}

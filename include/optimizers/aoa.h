@@ -21,8 +21,8 @@ public:
 
 	struct parameters
 	{
-		std::size_t n_solutions = 30;
-		std::size_t n_iterations = 500;
+		std::size_t n_solutions{};
+		std::size_t n_iterations{};
 		float c1 = 2.0f;
 		float c2 = 6.0f;
 		float c3 = 2.0f;
@@ -38,6 +38,10 @@ public:
 
 	optimization_result<Dim> optimize(iteration_callback on_iteration = {}) override
 	{
+		constexpr float eps = std::numeric_limits<float>::min();
+		constexpr float u = 1.0f;
+		constexpr float l = 0.1f;
+
 		evaluation_counter<Dim> evaluate(problem_);
 		const optimization_bounds<Dim>& bounds = problem_.bounds();
 		const auto& [n_solutions, n_iterations, c1, c2, c3, c4] = parameters_;
@@ -55,7 +59,7 @@ public:
 			solutions[s].density = rng::uniform();
 			solutions[s].volume = rng::uniform();
 
-			float fitness = evaluate(solutions[s].parameters);
+			const float fitness = evaluate(solutions[s].parameters);
 			solutions[s].fitness = fitness;
 
 			if (s == 0 || fitness < best.fitness)
@@ -72,10 +76,6 @@ public:
 				const float progress = static_cast<float>(i + 1) / n_iterations;
 				return std::exp(1.0f - progress) - progress;
 			};
-
-		constexpr float eps = std::numeric_limits<float>::min();
-		constexpr float u = 1.0f;
-		constexpr float l = 0.1f;
 
 		for (std::size_t i{}; i < n_iterations; ++i)
 		{

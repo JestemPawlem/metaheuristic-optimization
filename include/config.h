@@ -53,29 +53,42 @@ public:
 		return cfg;
 	}
 
-	std::string get_string(std::string_view key, std::string_view default_val) const
+	std::string get_string(std::string key, std::string default_val) const
 	{
-		if (const auto it = values_.find(std::string(key)); it != values_.end())
+		if (const auto it = values_.find(key); it != values_.end())
 			return it->second;
-		return std::string(default_val);
+		return default_val;
 	}
 
 	template <typename T>
 		requires std::integral<T> || std::floating_point<T>
-	T get(std::string_view key, T default_val) const
+	T get(std::string key, T default_val) const
 	{
-		const auto it = values_.find(std::string(key));
+		const auto it = values_.find(key);
 		if (it == values_.end())
 			return default_val;
 
 		const std::string_view sv = it->second;
-		T result{};
-		const auto [ptr, ec] = std::from_chars(sv.data(), sv.data() + sv.size(), result);
 
-		if (ec != std::errc{} || ptr != sv.data() + sv.size())
-			throw std::runtime_error("Invalid numeric value for key '" + std::string(key) + "': " + it->second);
+		if constexpr (std::same_as<T, bool>)
+		{
+			if (sv == "true")
+				return true;
+			if (sv == "false")
+				return false;
 
-		return result;
+			throw std::runtime_error("Invalid boolean value for key '" + key + "': " + it->second);
+		}
+		else
+		{
+			T result{};
+			const auto [ptr, ec] = std::from_chars(sv.data(), sv.data() + sv.size(), result);
+
+			if (ec != std::errc{} || ptr != sv.data() + sv.size())
+				throw std::runtime_error("Invalid numeric value for key '" + key + "': " + it->second);
+
+			return result;
+		}
 	}
 
 private:

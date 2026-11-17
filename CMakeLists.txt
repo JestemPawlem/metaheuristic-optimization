@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(ihcp_optimizer
-    src/main.cpp "include/optimizers/aoa.h" "include/problems/benchmarks.h" "include/problems/problem_factory.h" "include/config.h")
+    src/main.cpp "include/optimizers/aoa.h" "include/problems/benchmarks.h" "include/problems/problem_factory.h" "include/config.h" "include/optimizers/sca.h")
 
 target_include_directories(ihcp_optimizer PRIVATE include)
 

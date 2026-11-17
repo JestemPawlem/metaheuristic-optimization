@@ -17,6 +17,7 @@
 #include "optimizers/optimizer.h"
 #include "optimizers/pso.h"
 #include "optimizers/rcga.h"
+#include "optimizers/sca.h"
 #include "problems/optimization_problem.h"
 
 template <std::size_t Dim>
@@ -37,13 +38,13 @@ public:
         const optimization_problem<Dim>& problem,
         const config& cfg)
     {
-        const std::size_t n_solutions = cfg.get<std::size_t>("n_solutions", 20);
-        const std::size_t n_iterations = cfg.get<std::size_t>("n_iterations", 80);
+        const std::size_t n_solutions = cfg.get("n_solutions", 20uz);
+        const std::size_t n_iterations = cfg.get("n_iterations", 80uz);
 
         if (algorithm == "aco")
         {
-            const float locality = cfg.get<float>("aco.locality", 0.3f);
-            const float evaporation = cfg.get<float>("aco.evaporation", 0.85f);
+            const float locality = cfg.get("aco.locality", 0.3f);
+            const float evaporation = cfg.get("aco.evaporation", 0.85f);
 
             hyperparam_list params = {
                 {"n_solutions", std::to_string(n_solutions)},
@@ -64,29 +65,29 @@ public:
         if (algorithm == "aoa")
         {
             using aoa = archimedes_optimization_algorithm<Dim>;
-            typename aoa::parameters p{
+            typename aoa::parameters params
+            {
                 .n_solutions = n_solutions,
                 .n_iterations = n_iterations,
-                .c1 = cfg.get<float>("aoa.c1", 2.0f),
-                .c2 = cfg.get<float>("aoa.c2", 6.0f),
-                .c3 = cfg.get<float>("aoa.c3", 2.0f),
-                .c4 = cfg.get<float>("aoa.c4", 0.5f)
+                .c1 = cfg.get("aoa.c1", 2.0f),
+                .c2 = cfg.get("aoa.c2", 6.0f),
+                .c3 = cfg.get("aoa.c3", 2.0f),
+                .c4 = cfg.get("aoa.c4", 0.5f)
             };
 
-            hyperparam_list params = {
-                {"n_solutions", std::to_string(p.n_solutions)},
-                {"n_iterations", std::to_string(p.n_iterations)},
-                {"aoa_c1", std::to_string(p.c1)},
-                {"aoa_c2", std::to_string(p.c2)},
-                {"aoa_c3", std::to_string(p.c3)},
-                {"aoa_c4", std::to_string(p.c4)}
+            hyperparam_list param_list = {
+                {"n_solutions", std::to_string(params.n_solutions)},
+                {"n_iterations", std::to_string(params.n_iterations)},
+                {"aoa_c1", std::to_string(params.c1)},
+                {"aoa_c2", std::to_string(params.c2)},
+                {"aoa_c3", std::to_string(params.c3)},
+                {"aoa_c4", std::to_string(params.c4)}
             };
 
-            auto factory = [&problem, p]() {
-                return std::make_unique<aoa>(problem, p);
-                };
-
-            return { std::move(factory), std::move(params) };
+            return {
+                [&problem, params]() { return std::make_unique<aoa>(problem, params); },
+                std::move(param_list)
+            };
         }
 
         if (algorithm == "cs")
@@ -103,6 +104,22 @@ public:
             auto factory = [&problem, n_solutions, cs_iterations, pa]() {
                 return std::make_unique<cuckoo_search<Dim>>(
                     problem, n_solutions, cs_iterations, pa
+                );
+                };
+
+            return { std::move(factory), std::move(params) };
+        }
+
+        if (algorithm == "gwo")
+        {
+            hyperparam_list params = {
+                {"n_solutions", std::to_string(n_solutions)},
+                {"n_iterations", std::to_string(n_iterations)}
+            };
+
+            auto factory = [&problem, n_solutions, n_iterations]() {
+                return std::make_unique<grey_wolf_optimizer<Dim>>(
+                    problem, n_solutions, n_iterations
                 );
                 };
 
@@ -153,20 +170,26 @@ public:
             return { std::move(factory), std::move(params) };
         }
 
-        if (algorithm == "gwo")
+        if (algorithm == "sca")
         {
-            hyperparam_list params = {
-                {"n_solutions", std::to_string(n_solutions)},
-                {"n_iterations", std::to_string(n_iterations)}
+            using sca = sine_cosine_algorithm<Dim>;
+            typename sca::parameters params
+            {
+                .n_solutions = n_solutions,
+                .n_iterations = n_iterations,
+                .a = cfg.get("sca.a", 2.0f)
             };
 
-            auto factory = [&problem, n_solutions, n_iterations]() {
-                return std::make_unique<grey_wolf_optimizer<Dim>>(
-                    problem, n_solutions, n_iterations
-                );
-                };
+            hyperparam_list param_list = {
+                {"n_solutions", std::to_string(params.n_solutions)},
+                {"n_iterations", std::to_string(params.n_iterations)},
+                {"sca_a", std::to_string(params.a)}
+            };
 
-            return { std::move(factory), std::move(params) };
+            return {
+                [&problem, params]() { return std::make_unique<sca>(problem, params); },
+                std::move(param_list)
+            };
         }
 
         throw std::invalid_argument(std::string("Unknown algorithm: ") + std::string(algorithm));

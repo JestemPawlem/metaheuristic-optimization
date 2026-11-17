@@ -58,6 +58,9 @@ public:
 
         for (std::size_t iter{}; iter < n_iterations_; ++iter)
         {
+            const float progress = static_cast<float>(iter) / n_iterations_;
+            const float scale = 0.05f * std::pow(1.0f - progress, 2.0f) + 1e-5f;
+
             solution prev_best = best;
 
             for (std::size_t i{}; i < n_solutions_; i += 2)
@@ -91,7 +94,7 @@ public:
 
                 for (std::size_t d{}; d < Dim; ++d)
                 {
-                    float sigma = ranges[d] * 0.05f;
+                    float sigma = ranges[d] * scale;
 
                     if (rng::bernoulli(mutation_rate_))
                     {
